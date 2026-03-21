@@ -1,18 +1,19 @@
 import { useFrame, useThree } from '@react-three/fiber';
 import { useEffect, useRef } from 'react';
 import * as THREE from 'three';
+import { THEME } from '../theme';
 
 export function CameraController() {
   const { camera, gl } = useThree();
-  const targetPosition = useRef(new THREE.Vector3(0, 0, 8)); // Match initial App.tsx camera
+  const targetPosition = useRef(new THREE.Vector3(0, 0, THEME.camera.initialZ)); // Match initial App.tsx camera
   
   const isDragging = useRef(false);
   const previousMousePosition = useRef({ x: 0, y: 0 });
 
   useEffect(() => {
     const handleWheel = (e: WheelEvent) => {
-      targetPosition.current.y -= e.deltaY * 0.01;
-      targetPosition.current.x += e.deltaX * 0.01;
+      targetPosition.current.y -= e.deltaY * THEME.camera.wheelSensitivity;
+      targetPosition.current.x += e.deltaX * THEME.camera.wheelSensitivity;
     };
 
     const handlePointerDown = (e: PointerEvent) => {
@@ -34,8 +35,8 @@ export function CameraController() {
       const deltaX = e.clientX - previousMousePosition.current.x;
       const deltaY = e.clientY - previousMousePosition.current.y;
       
-      targetPosition.current.x -= deltaX * 0.02;
-      targetPosition.current.y += deltaY * 0.02;
+      targetPosition.current.x -= deltaX * THEME.camera.dragSensitivity;
+      targetPosition.current.y += deltaY * THEME.camera.dragSensitivity;
       
       previousMousePosition.current = { x: e.clientX, y: e.clientY };
     };
@@ -58,7 +59,7 @@ export function CameraController() {
 
   useFrame((_, delta) => {
     // Smooth damp camera position towards target
-    camera.position.lerp(targetPosition.current, 5 * delta);
+    camera.position.lerp(targetPosition.current, THEME.animation.cameraLerp * delta);
   });
 
   return null;

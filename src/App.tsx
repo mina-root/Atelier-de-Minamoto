@@ -5,16 +5,17 @@ import { CameraController } from './components/CameraController';
 import { InfiniteWall } from './components/InfiniteWall';
 import { useState } from 'react';
 import { type IllustrationItem } from './data';
+import { THEME } from './theme';
 import './index.css';
 
-function Scene({ onIllustrationClick }: { onIllustrationClick: (item: IllustrationItem) => void }) {
+ function Scene({ onIllustrationClick }: { onIllustrationClick: (item: IllustrationItem) => void }) {
   return (
     <>
-      <ambientLight intensity={0.6} />
+      <ambientLight intensity={THEME.colors.ambientLight} />
       <directionalLight 
         castShadow 
         position={[2, 5, 5]} 
-        intensity={0.8} 
+        intensity={THEME.colors.directLight} 
         shadow-mapSize={[2048, 2048]}
         shadow-camera-left={-20}
         shadow-camera-right={20}
@@ -25,7 +26,7 @@ function Scene({ onIllustrationClick }: { onIllustrationClick: (item: Illustrati
       {/* Background Plane for deep shadows */}
       <mesh receiveShadow position={[0, 0, -2]}>
         <planeGeometry args={[200, 200]} />
-        <meshStandardMaterial color="#e0e0e0" roughness={1} />
+        <meshStandardMaterial color={THEME.colors.scenePlane} roughness={1} />
       </mesh>
 
       <InfiniteWall onIllustrationClick={onIllustrationClick} />
@@ -40,15 +41,15 @@ function App() {
     <div style={{ width: '100vw', height: '100vh', position: 'relative', overflow: 'hidden' }}>
       <Canvas
         shadows
-        camera={{ position: [0, 0, 8], fov: 40 }}
+        camera={{ position: [0, 0, THEME.camera.initialZ], fov: THEME.camera.fov }}
         style={{ width: '100%', height: '100%' }}
       >
         <CameraController />
-        <color attach="background" args={['#fafafa']} />
+        <color attach="background" args={[THEME.colors.background]} />
         <Suspense fallback={null}>
           <Scene onIllustrationClick={setSelectedIllustration} />
-          <Environment preset="city" environmentIntensity={0.5} />
-        </Suspense>
+          <Environment preset="city" environmentIntensity={THEME.colors.environmentIntensity} />
+        </ Suspense>
       </Canvas>
 
       {/* Standard HTML Illustration Modal */}
@@ -58,7 +59,7 @@ function App() {
             position: 'fixed',
             top: 0, left: 0,
             width: '100vw', height: '100vh',
-            background: 'rgba(0,0,0,0.85)',
+            background: THEME.colors.modalBackground,
             backdropFilter: 'blur(12px)',
             zIndex: 10000,
             display: 'flex',
@@ -78,18 +79,50 @@ function App() {
             flexDirection: 'column',
             alignItems: 'center',
           }}>
-            <img 
-              src={selectedIllustration.src} 
-              alt={selectedIllustration.title}
-              style={{
-                maxWidth: '100%',
-                maxHeight: '100%',
-                objectFit: 'contain',
-                borderRadius: '12px',
-                boxShadow: '0 30px 60px rgba(0,0,0,0.5)',
-                border: '1px solid rgba(255,255,255,0.1)'
-              }}
-            />
+            <div style={{
+              width: '100%',
+              aspectRatio: selectedIllustration.aspectRatio || (selectedIllustration.type === 'youtube' ? 1.7778 : 1),
+              maxWidth: '1200px',
+              maxHeight: '70vh',
+              position: 'relative',
+              borderRadius: THEME.block.borderRadius,
+              overflow: 'hidden',
+              boxShadow: '0 30px 60px rgba(0,0,0,0.5)',
+              border: '1px solid rgba(255,255,255,0.1)'
+            }}>
+              {selectedIllustration.type === 'youtube' ? (
+                <iframe
+                  width="100%"
+                  height="100%"
+                  src={`https://www.youtube.com/embed/${selectedIllustration.videoId}?autoplay=1`}
+                  title={selectedIllustration.title}
+                  frameBorder="0"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                  allowFullScreen
+                  style={{ border: 'none' }}
+                />
+              ) : selectedIllustration.type === 'soundcloud' ? (
+                <iframe
+                  width="100%"
+                  height="100%"
+                  frameBorder="no"
+                  scrolling="no"
+                  allow="autoplay"
+                  src={`https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/${selectedIllustration.trackId}&color=%23ff5500&auto_play=true&hide_related=true&show_comments=false&show_user=true&show_reposts=false&show_teaser=false&visual=true`}
+                  style={{ border: 'none' }}
+                />
+              ) : (
+                <img 
+                  src={selectedIllustration.src} 
+                  alt={selectedIllustration.title}
+                  style={{
+                    width: '100%',
+                    height: '100%',
+                    objectFit: 'contain',
+                  }}
+                />
+              )}
+            </div>
             <div style={{
               marginTop: '24px',
               textAlign: 'center',
@@ -98,7 +131,7 @@ function App() {
               <h2 style={{ fontSize: '32px', margin: '0 0 12px 0', letterSpacing: '0.05em' }}>
                 {selectedIllustration.title}
               </h2>
-              <p style={{ fontSize: '16px', color: '#aaaaaa', margin: 0, maxWidth: '600px', lineHeight: '1.6' }}>
+              <p style={{ fontSize: '16px', color: THEME.colors.textMuted, margin: 0, maxWidth: '600px', lineHeight: '1.6' }}>
                 {selectedIllustration.caption}
               </p>
             </div>
