@@ -417,7 +417,7 @@ function WallBlock({ uid, rect, data, onClick, illustrationItem, onIllustrationC
     >
       <meshStandardMaterial
         ref={matRef}
-        color={showContent ? (illustrationItem ? '#000000' : (isThemedAbout ? THEME.colors.blockAbout : THEME.colors.blockDefault)) : THEME.colors.blockEmpty}
+        color={showContent ? (isThemedAbout ? THEME.colors.blockAbout : THEME.colors.blockDefault) : THEME.colors.blockEmpty}
         roughness={0.3}
         metalness={0.05}
         transparent
@@ -490,7 +490,7 @@ function IndependentEmbed({ rect, data, illustrationItem }: { rect: Rect, data: 
       )}
       {data.type === 'about_name' && (
         <Html transform position={[0, 0, 0]} distanceFactor={1.5} pointerEvents="none" className="wall-html-content">
-          <div style={{ textAlign: 'center', color: 'white', width: '600px', userSelect: 'none' }}>
+          <div style={{ textAlign: 'center', color: '#111', width: '600px', userSelect: 'none' }}>
             <h1 style={{ fontSize: '64px', fontWeight: 900, letterSpacing: '0.2em' }}>ミナモト</h1>
           </div>
         </Html>
@@ -498,7 +498,7 @@ function IndependentEmbed({ rect, data, illustrationItem }: { rect: Rect, data: 
       {data.type === 'about_text' && (
         <Html transform position={[0, 0, 0]} scale={isProfileAbout ? 1 : 0.2} distanceFactor={isProfileAbout ? 1.2 : undefined} pointerEvents="none" className="wall-html-content">
           <div style={{ 
-            color: 'white', textAlign: (isProfileAbout || isLargeText) ? 'center' : 'left', fontWeight: isLargeText ? 700 : 400,
+            color: '#111', textAlign: (isProfileAbout || isLargeText) ? 'center' : 'left', fontWeight: isLargeText ? 700 : 400,
             fontSize: isProfileAbout ? '20px' : (isLargeText ? '24px' : '18px'), 
             width: isProfileAbout ? '400px' : `${rect.w * 200}px`, height: isProfileAbout ? 'auto' : `${rect.h * 200}px`,
             whiteSpace: 'pre-wrap', lineHeight: 1.6, overflowY: 'hidden', padding: isProfileAbout ? '0' : '20px', display: 'flex', alignItems: 'center', justifyContent: 'center', boxSizing: 'border-box'

@@ -49,22 +49,22 @@ export const THEME = {
   // --- Colors & Aesthetics ---
   colors: {
      background: '#ffffff',
-    scenePlane: '#f0f0f0',
+    scenePlane: '#ffffff',
     ambientLight: 0.8,
     directLight: 1.0,
     environmentIntensity: 0.7,
     
     // Block Materials
-    blockDefault: '#c2baff',
-    blockHover: '#d4ceff',
+    blockDefault: '#99eaff',
+    blockHover: '#b3f0ff',
     blockEmpty: '#ffffff',
-    blockAbout: '#c2baff',
+    blockAbout: '#99eaff',
     
     // UI & Text
-    textPrimary: '#111111',
+    textPrimary: '#ffffff',
     textSecondary: '#444444',
     textMuted: '#aaaaaa',
-    accent: '#333333',
+    accent: '#00aaff',
     modalBackground: 'rgba(0,0,0,0.85)',
     overlayBackground: 'rgba(0,0,0,0.7)',
     overlayBorder: 'rgba(255,255,255,0.2)',
