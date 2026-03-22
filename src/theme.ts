@@ -48,17 +48,17 @@ export const THEME = {
 
   // --- Colors & Aesthetics ---
   colors: {
-    background: '#fafafa',
-    scenePlane: '#e0e0e0',
-    ambientLight: 0.6,
-    directLight: 0.8,
-    environmentIntensity: 0.5,
+     background: '#ffffff',
+    scenePlane: '#f0f0f0',
+    ambientLight: 0.8,
+    directLight: 1.0,
+    environmentIntensity: 0.7,
     
     // Block Materials
-    blockDefault: '#f4f4f4',
-    blockHover: '#fcfcfc',
+    blockDefault: '#c2baff',
+    blockHover: '#d4ceff',
     blockEmpty: '#ffffff',
-    blockAbout: '#ffffff',
+    blockAbout: '#c2baff',
     
     // UI & Text
     textPrimary: '#111111',

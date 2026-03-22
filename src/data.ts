@@ -102,242 +102,156 @@ export const aboutData: GridItemData[] = [
   }
 ];
 
-// Navigation items (Fixed 4 items)
-export const navData: GridItemData[] = [
-  { 
-    id: "nav-illustration", 
-    type: "illustration_folder", 
-    title: "Illustration", 
-    src: "https://images.unsplash.com/photo-1579783902614-a3fb3927b6a5",
-    width: 1.4, 
-    height: 1.7, 
-    depthOffset: 0.4,
-    illustrationItems: illustrationsData
-  },
-  { 
-    id: "nav-discography", 
-    type: "illustration_folder", 
-    title: "Discography", 
-    src: "/illustrations/Outpost_Dissonance.jpg",
-    width: 1.5, 
-    height: 1.5, 
-    depthOffset: 0.5,
-    illustrationItems: discographyData
-  },
-  { id: "nav-products", type: "project", title: "Products", description: "オリジナルグッズやソフトウェア", src: "https://github.com", width: 1.3, height: 1.8, depthOffset: 0.3 },
-  { id: "nav-contact", type: "contact", title: "Contact", description: "依頼やご相談はこちら：\nexample@portfolio.com", width: 1.4, height: 1.4, depthOffset: 0.6 }
+// 11 Illustrations + 3 Songs = 14 initial content block pairs
+export const contentPoolData: { content: GridItemData, desc?: GridItemData }[] = [];
+
+illustrationsData.forEach((illus, i) => {
+  const targetArea = 3.5;
+  const h = Math.sqrt(targetArea / illus.aspectRatio);
+  const w = h * illus.aspectRatio;
+  
+  contentPoolData.push({
+    content: {
+      id: `illus-c-${i}`,
+      type: 'image',
+      src: illus.src,
+      title: illus.title,
+      width: w,
+      height: h,
+      depthOffset: Math.random() * 0.3,
+      illustrationItems: [illus]
+    },
+    desc: {
+      id: `illus-d-${i}`,
+      type: 'about_text',
+      description: illus.caption || illus.title,
+      width: 1.2,
+      height: 1.0,
+      depthOffset: Math.random() * 0.3
+    }
+  });
+});
+
+discographyData.forEach((song, i) => {
+  contentPoolData.push({
+    content: {
+      id: `song-c-${i}`,
+      type: song.type || 'image',
+      videoId: song.videoId,
+      trackId: song.trackId,
+      src: song.src,
+      title: song.title,
+      width: song.aspectRatio > 2 ? 3.0 : 2.4, // 3.0 for soundcloud, 2.4 for youtube
+      height: song.aspectRatio > 2 ? 1.0 : 1.35,
+      depthOffset: Math.random() * 0.3,
+      illustrationItems: [song]
+    },
+    desc: {
+      id: `song-d-${i}`,
+      type: 'about_text',
+      description: song.caption || song.title,
+      width: 1.2,
+      height: 1.0,
+      depthOffset: Math.random() * 0.3
+    }
+  });
+});
+
+export const requestFullText = `✦ ご依頼について
+
+有償にて、イラストおよび楽曲制作を承っております。
+
+用途・ご希望内容をご説明いただければ、それに応じたご提案をいたします。
+ご予算がある場合はあわせてご提示いただけますと、内容を調整しやすくなります。
+
+また、簡易的なご依頼については Skeb での受付も可能です。
+（Skebは比較的安価にご依頼いただけますが、リテイク不可・必ず受注できるわけではない点をご理解ください）
+
+■ 着手・納期
+
+状況により変動しますが、おおよそ制作には以下の期間を目安としていただきます。
+
+イラスト：1週間〜1ヶ月
+楽曲制作：1ヶ月〜3ヶ月
+
+内容・スケジュールにより前後しますので、詳細はご相談ください。
+
+■ 料金・権利について
+
+商用利用・法人案件は追加料金をいただきます。
+著作権は原則として譲渡いたしません。
+
+著作権譲渡をご希望の場合は、別途ご相談ください（追加料金あり）
+
+■ ご依頼方法
+
+上記内容に同意いただける場合、XのDMよりご連絡ください。
+お気軽にご相談いただければ嬉しいです。`;
+
+export const termsFullText = `✦ 制作物の利用について
+
+■ 個人・非商用利用
+
+使用報告（事後可）をいただければ、自由にご利用いただけます。
+例：SNS投稿／趣味制作／学校課題 など
+
+■ 同人・創作活動での利用
+
+無償または小規模な活動での利用は、使用報告のみで可能です。
+可能であればクレジット表記をお願いいたします。
+
+例：
+「歌ってみた」動画
+音ゲー譜面投稿 など
+
+■ 商用利用
+
+商業作品・収益性の高い用途については、事前にご相談ください。
+例：企業案件／商業出版／ゲーム組み込み など
+
+■ 禁止事項
+
+公序良俗に反する利用
+二次配布・再配布を主目的とした利用
+
+■ 著作権について
+
+すべての作品の著作権は作者（ミナモト）に帰属します。
+原則として譲渡は行っておりません。
+
+■ データ提供について
+
+用途に応じて、元データ等の提供が可能な場合があります。
+必要な場合はご相談ください。`;
+
+export const requestTextDataArray: GridItemData[] = [
+  {
+    id: 'text-request-trigger',
+    type: 'about_text',
+    title: 'ご依頼について',
+    description: requestFullText,
+    width: 3.0,
+    height: 1.2,
+    depthOffset: 0.1
+  }
 ];
 
-// 13 Main Content Blocks with specific aspect ratios
-export const contentPoolData: { content: GridItemData, desc: GridItemData, ratioType: 'horizontal' | '16:9' | 'vertical_1_1414' | 'vertical_9_21' }[] = [];
-
-// 3 Horizontal (~3:1, specifically 1200x400) - Using SoundCloud as placeholders for now
-for(let i=0; i<3; i++) {
-  contentPoolData.push({
-    ratioType: 'horizontal',
-    content: { id: `hc-${i}`, type: 'soundcloud', trackId: "270383324", width: 3.0, height: 1.0, depthOffset: Math.random()*0.3 },
-    desc: { id: `hcd-${i}`, type: 'about_text', description: `SoundCloud ${i} の詳細情報。ここには楽曲制作の背景や想いが記載されます。`, width: 1.2, height: 1.0, depthOffset: Math.random()*0.3 }
-  });
-}
-
-// 6 16:9 or Square Images from illustrations
-const horizontalImages = [
-  illustrationsData[2], // dropsound (1.51)
-  illustrationsData[5], // 拡散する未来 (1.66)
-  illustrationsData[7], // 狂信 (1.77)
-  illustrationsData[9], // 風化させることなかれ (2.0)
-  illustrationsData[0], // Outpost_Dissonance (1.0)
-  illustrationsData[1], // a_grain (0.99)
+export const termsTextDataArray: GridItemData[] = [
+  {
+    id: 'text-terms-trigger',
+    type: 'about_text',
+    title: '制作物の利用について',
+    description: termsFullText,
+    width: 3.5,
+    height: 1.2,
+    depthOffset: 0.1
+  }
 ];
 
-for(let i=0; i<6; i++) {
-  const illus = horizontalImages[i] || illustrationsData[0];
-  contentPoolData.push({
-    ratioType: '16:9',
-    content: { 
-      id: `169c-${i}`, 
-      type: 'image', 
-      src: illus.src, 
-      title: illus.title,
-      width: 2.4, 
-      height: 1.35, 
-      depthOffset: Math.random()*0.3 
-    },
-    desc: { id: `169cd-${i}`, type: 'about_text', description: `${illus.title} についての解説文。作品に込めたコンセプトなどをここに記述します。`, width: 1.2, height: 1.2, depthOffset: Math.random()*0.3 }
-  });
-}
 
-// 2 Vertical (1 : 1.414)
-const verticalImages1 = [
-  illustrationsData[8], // 跳躍3.5 (0.57)
-  illustrationsData[10], // 風鈴 (0.59)
-];
-
-for(let i=0; i<2; i++) {
-  const illus = verticalImages1[i] || illustrationsData[0];
-  contentPoolData.push({
-    ratioType: 'vertical_1_1414',
-    content: { 
-      id: `v1c-${i}`, 
-      type: 'image', 
-      src: illus.src, 
-      title: illus.title,
-      width: 1.414, 
-      height: 2.0, 
-      depthOffset: Math.random()*0.3 
-    },
-    desc: { id: `v1cd-${i}`, type: 'about_text', description: `${illus.title} の縦型構図に関するメモ。`, width: 1.1, height: 1.2, depthOffset: Math.random()*0.3 }
-  });
-}
-
-// 2 Vertical (9:21)
-const verticalImages2 = [
-  illustrationsData[3], // magsafeangel (0.47)
-  illustrationsData[4], // 向こう側 (0.46)
-  illustrationsData[6], // 浮遊 (0.46)
-];
-
-for(let i=0; i<2; i++) {
-  const illus = verticalImages2[i] || illustrationsData[0];
-  contentPoolData.push({
-    ratioType: 'vertical_9_21',
-    content: { 
-      id: `v2c-${i}`, 
-      type: 'image', 
-      src: illus.src, 
-      title: illus.title,
-      width: 1.2, 
-      height: 2.8, 
-      depthOffset: Math.random()*0.3 
-    },
-    desc: { id: `v2cd-${i}`, type: 'about_text', description: `${illus.title}。極端な縦長アスペクト比を活かした表現。`, width: 1.3, height: 1.2, depthOffset: Math.random()*0.3 }
-  });
-}
-// 2 Square (1:1)
-for(let i=0; i<2; i++) {
-  const illus = illustrationsData[i] || illustrationsData[0];
-  contentPoolData.push({
-    ratioType: 'vertical_1_1414', // Using vertical logic but dimensions are square
-    content: { 
-      id: `sqc-${i}`, 
-      type: 'image', 
-      src: illus.src, 
-      title: illus.title,
-      width: 2.0, 
-      height: 2.0, 
-      depthOffset: Math.random()*0.3 
-    },
-    desc: { id: `sqcd-${i}`, type: 'about_text', description: `${illus.title}。正方形のアスペクト比を活かした作品。`, width: 1.2, height: 1.2, depthOffset: Math.random()*0.3 }
-  });
-}
-
-// 1 2:1 (Horizontal)
-contentPoolData.push({
-  ratioType: 'horizontal',
-  content: { 
-    id: `21c-0`, type: 'image', src: illustrationsData[0].src, title: illustrationsData[0].title,
-    width: 2.0, height: 1.0, depthOffset: Math.random()*0.3 
-  },
-  desc: { id: `21cd-0`, type: 'about_text', description: `2:1 アスペクト比の作品展示。`, width: 1.0, height: 1.0, depthOffset: Math.random()*0.3 }
-});
-
-// 1 additional 1:1.414 (Vertical)
-contentPoolData.push({
-  ratioType: 'vertical_1_1414',
-  content: { 
-    id: `v1c-2`, type: 'image', src: illustrationsData[1].src, title: illustrationsData[1].title,
-    width: 1.414, height: 2.0, depthOffset: Math.random()*0.3 
-  },
-  desc: { id: `v1cd-2`, type: 'about_text', description: `追加の 1:1.414 縦型ブロック。`, width: 1.1, height: 1.2, depthOffset: Math.random()*0.3 }
-});
-
-// 1 additional 9:21 (Vertical)
-contentPoolData.push({
-  ratioType: 'vertical_9_21',
-  content: { 
-    id: `v2c-2`, type: 'image', src: illustrationsData[2].src, title: illustrationsData[2].title,
-    width: 1.2, height: 2.8, depthOffset: Math.random()*0.3 
-  },
-  desc: { id: `v2cd-2`, type: 'about_text', description: `追加の 9:21 縦型ブロック。`, width: 1.3, height: 1.2, depthOffset: Math.random()*0.3 }
-});
-
-// 2 Vertical (1:2)
-for(let i=0; i<2; i++) {
-  const illus = illustrationsData[i+3] || illustrationsData[0];
-  contentPoolData.push({
-    ratioType: 'vertical_9_21',
-    content: { 
-      id: `v3c-${i}`, type: 'image', src: illus.src, title: illus.title,
-      width: 1.0, height: 2.0, depthOffset: Math.random()*0.3 
-    },
-    desc: { id: `v3cd-${i}`, type: 'about_text', description: `1:2 の縦長ラインを活かした作品。`, width: 1.0, height: 1.0, depthOffset: Math.random()*0.3 }
-  });
-}
-
-// Add 2 more 3:1 blocks (for SoundCloud)
-for(let i=3; i<5; i++) {
-  contentPoolData.push({
-    ratioType: 'horizontal',
-    content: { id: `hc-${i}`, type: 'soundcloud', trackId: "270383324", width: 3.0, height: 1.0, depthOffset: Math.random()*0.3 },
-    desc: { id: `hcd-${i}`, type: 'about_text', description: `SoundCloud ${i} の詳細情報。`, width: 1.2, height: 1.0, depthOffset: Math.random()*0.3 }
-  });
-}
-
-// Add 1 more 2:1 block
-contentPoolData.push({
-  ratioType: 'horizontal',
-  content: { 
-    id: `21c-1`, type: 'image', src: illustrationsData[4]?.src || illustrationsData[0].src, title: illustrationsData[4]?.title || "",
-    width: 2.0, height: 1.0, depthOffset: Math.random()*0.3 
-  },
-  desc: { id: `21cd-1`, type: 'about_text', description: `2:1 アスペクト比の追加作品。`, width: 1.0, height: 1.0, depthOffset: Math.random()*0.3 }
-});
-
-// Add 1 more 1:1.414
-contentPoolData.push({
-  ratioType: 'vertical_1_1414',
-  content: { 
-    id: `v1c-3`, type: 'image', src: illustrationsData[5]?.src || illustrationsData[0].src, title: illustrationsData[5]?.title || "",
-    width: 1.414, height: 2.0, depthOffset: Math.random()*0.3 
-  },
-  desc: { id: `v1cd-3`, type: 'about_text', description: `1:1.414 縦型ブロック(4つ目)。`, width: 1.1, height: 1.2, depthOffset: Math.random()*0.3 }
-});
-
-// Add 1 more 9:21
-contentPoolData.push({
-  ratioType: 'vertical_9_21',
-  content: { 
-    id: `v2c-3`, type: 'image', src: illustrationsData[6]?.src || illustrationsData[0].src, title: illustrationsData[6]?.title || "",
-    width: 1.2, height: 2.8, depthOffset: Math.random()*0.3 
-  },
-  desc: { id: `v2cd-3`, type: 'about_text', description: `9:21 縦型ブロック(4つ目)。`, width: 1.3, height: 1.2, depthOffset: Math.random()*0.3 }
-});
-
-// Add 1 more 1:2
-contentPoolData.push({
-  ratioType: 'vertical_9_21',
-  content: { 
-    id: `v3c-2`, type: 'image', src: illustrationsData[7]?.src || illustrationsData[0].src, title: illustrationsData[7]?.title || "",
-    width: 1.0, height: 2.0, depthOffset: Math.random()*0.3 
-  },
-  desc: { id: `v3cd-2`, type: 'about_text', description: `1:2 縦型ブロック(3つ目)。`, width: 1.0, height: 1.0, depthOffset: Math.random()*0.3 }
-});
-
-// Add 1 more 1:1
-contentPoolData.push({
-  ratioType: 'vertical_1_1414',
-  content: { 
-    id: `sqc-2`, type: 'image', src: illustrationsData[8]?.src || illustrationsData[0].src, title: illustrationsData[8]?.title || "",
-    width: 2.0, height: 2.0, depthOffset: Math.random()*0.3 
-  },
-  desc: { id: `sqcd-2`, type: 'about_text', description: `正方形ブロック(3つ目)。`, width: 1.2, height: 1.2, depthOffset: Math.random()*0.3 }
-});
-
-
-// Fallback old array to avoid breaking things entirely before we replace the InfiniteWall logic
+// Fallback logic
 export const portfolioData: GridItemData[] = [
-  ...navData,
-  ...contentPoolData.map(c => c.content),
-  ...contentPoolData.map(c => c.desc)
+  ...contentPoolData.map(c => c.content)
 ];
+
 

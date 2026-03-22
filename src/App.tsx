@@ -1,55 +1,108 @@
-import { Canvas } from '@react-three/fiber';
-import { Environment } from '@react-three/drei';
-import { Suspense } from 'react';
+import { Canvas, useThree } from '@react-three/fiber';
+import { Suspense, useEffect, useState } from 'react';
+import * as THREE from 'three';
 import { CameraController } from './components/CameraController';
 import { InfiniteWall } from './components/InfiniteWall';
-import { useState } from 'react';
 import { type IllustrationItem } from './data';
 import { THEME } from './theme';
 import './index.css';
 
- function Scene({ onIllustrationClick }: { onIllustrationClick: (item: IllustrationItem) => void }) {
+function ResponsiveCamera() {
+  const { camera, size } = useThree();
+  useEffect(() => {
+    if ((camera as THREE.PerspectiveCamera).isPerspectiveCamera) {
+      const pCam = camera as THREE.PerspectiveCamera;
+      
+      // We want to maintain a constant "Pixels per Unit" at the Z=0 plane.
+      // At THEME.camera.fov (40) and THEME.camera.initialZ (8), 
+      // the visible vertical height in units is:
+      // staticHeightUnits = 2 * initialZ * Math.tan( (40 * Math.PI) / 360 )
+      // = 16 * 0.3639 = 5.82 units.
+      // If we assume this was tailored for a standard window height (e.g., 800px),
+      // then 5.82 units = 800 pixels -> ~137 pixels per unit.
+      
+      const referenceHeight = 800; // Reference window height for the intended look
+      const vFovBaselineRad = (THEME.camera.fov * Math.PI) / 180;
+      const unitsAtZ0 = 2 * THEME.camera.initialZ * Math.tan(vFovBaselineRad / 2);
+      const pixelsPerUnit = referenceHeight / unitsAtZ0;
+
+      // Now we calculate the FOV for the CURRENT window size to keep pixelsPerUnit constant
+      // tan(fov/2) = (size.height / pixelsPerUnit) / (2 * camera.position.z)
+      const currentHeightUnits = size.height / pixelsPerUnit;
+      const newVFovRad = 2 * Math.atan(currentHeightUnits / (2 * THEME.camera.initialZ));
+      const newVFovDeg = (newVFovRad * 180) / Math.PI;
+
+      pCam.fov = newVFovDeg;
+      pCam.updateProjectionMatrix();
+    }
+  }, [size, camera]);
+  return null;
+}
+
+function Scene({ 
+  onIllustrationClick, 
+  onTextClick,
+  isModalOpen 
+}: { 
+  onIllustrationClick: (item: IllustrationItem) => void, 
+  onTextClick: (title: string, content: string) => void,
+  isModalOpen: boolean 
+}) {
   return (
     <>
-      <ambientLight intensity={THEME.colors.ambientLight} />
+      <ambientLight intensity={1.2} />
       <directionalLight 
-        castShadow 
         position={[2, 5, 5]} 
         intensity={THEME.colors.directLight} 
-        shadow-mapSize={[2048, 2048]}
-        shadow-camera-left={-20}
-        shadow-camera-right={20}
-        shadow-camera-top={20}
-        shadow-camera-bottom={-20}
       />
       
-      {/* Background Plane for deep shadows */}
-      <mesh receiveShadow position={[0, 0, -2]}>
+      {/* Background Plane */}
+      <mesh position={[0, 0, -2]}>
         <planeGeometry args={[200, 200]} />
         <meshStandardMaterial color={THEME.colors.scenePlane} roughness={1} />
       </mesh>
 
-      <InfiniteWall onIllustrationClick={onIllustrationClick} />
+      <InfiniteWall 
+        onIllustrationClick={onIllustrationClick} 
+        onTextClick={onTextClick}
+        isModalOpen={isModalOpen} 
+      />
     </>
   );
 }
 
 function App() {
   const [selectedIllustration, setSelectedIllustration] = useState<IllustrationItem | null>(null);
+  const [selectedText, setSelectedText] = useState<{ title: string, content: string } | null>(null);
+
+  const closeModal = () => {
+    setSelectedIllustration(null);
+    setSelectedText(null);
+  };
+
+  const isModalOpen = !!selectedIllustration || !!selectedText;
 
   return (
-    <div style={{ width: '100vw', height: '100vh', position: 'relative', overflow: 'hidden' }}>
+    <div 
+      className={isModalOpen ? 'modal-is-open' : ''}
+      style={{ width: '100vw', height: '100vh', position: 'relative', overflow: 'hidden' }}
+    >
       <Canvas
-        shadows
+        gl={{ toneMappingExposure: 1.2, antialias: false }}
         camera={{ position: [0, 0, THEME.camera.initialZ], fov: THEME.camera.fov }}
         style={{ width: '100%', height: '100%' }}
+        dpr={[1, 1.5]}
       >
+        <ResponsiveCamera />
         <CameraController />
         <color attach="background" args={[THEME.colors.background]} />
         <Suspense fallback={null}>
-          <Scene onIllustrationClick={setSelectedIllustration} />
-          <Environment preset="city" environmentIntensity={THEME.colors.environmentIntensity} />
-        </ Suspense>
+          <Scene 
+            onIllustrationClick={setSelectedIllustration} 
+            onTextClick={(title, content) => setSelectedText({ title, content })}
+            isModalOpen={isModalOpen}
+          />
+        </Suspense>
       </Canvas>
 
       {/* Standard HTML Illustration Modal */}
@@ -61,7 +114,7 @@ function App() {
             width: '100vw', height: '100vh',
             background: THEME.colors.modalBackground,
             backdropFilter: 'blur(12px)',
-            zIndex: 10000,
+            zIndex: 2147483647,
             display: 'flex',
             flexDirection: 'column',
             alignItems: 'center',
@@ -69,7 +122,7 @@ function App() {
             cursor: 'zoom-out',
             animation: 'fadeIn 0.3s ease-out'
           }}
-          onClick={() => setSelectedIllustration(null)}
+          onClick={closeModal}
         >
           <div style={{
             position: 'relative',
@@ -156,6 +209,96 @@ function App() {
           `}} />
         </div>
       )}
+
+      {/* Text Content Modal */}
+      {selectedText && (
+        <div 
+          style={{
+            position: 'fixed',
+            top: 0, left: 0,
+            width: '100vw', height: '100vh',
+            background: THEME.colors.modalBackground,
+            backdropFilter: 'blur(12px)',
+            zIndex: 2147483647,
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            justifyContent: 'center',
+            cursor: 'zoom-out',
+            animation: 'fadeIn 0.3s ease-out'
+          }}
+          onClick={closeModal}
+        >
+          <div 
+            style={{
+              position: 'relative',
+              maxWidth: '800px',
+              width: '90%',
+              maxHeight: '80vh',
+              background: 'rgba(20, 20, 20, 0.8)',
+              borderRadius: THEME.block.borderRadius,
+              padding: '40px',
+              color: 'white',
+              boxShadow: '0 30px 60px rgba(0,0,0,0.5)',
+              border: '1px solid rgba(255,255,255,0.1)',
+              cursor: 'auto',
+              overflowY: 'auto',
+              display: 'flex',
+              flexDirection: 'column'
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <h2 style={{ 
+              fontSize: '32px', 
+              margin: '0 0 24px 0', 
+              letterSpacing: '0.05em',
+              borderBottom: '1px solid rgba(255,255,255,0.1)',
+              paddingBottom: '16px'
+            }}>
+              {selectedText.title}
+            </h2>
+            <div style={{ 
+              fontSize: '16px', 
+              lineHeight: '1.8', 
+              whiteSpace: 'pre-wrap',
+              color: THEME.colors.textMuted
+            }}>
+              {selectedText.content}
+            </div>
+            
+            <button 
+              onClick={closeModal}
+              style={{
+                marginTop: '40px',
+                padding: '12px 24px',
+                background: 'rgba(255,255,255,0.1)',
+                border: '1px solid rgba(255,255,255,0.2)',
+                color: 'white',
+                borderRadius: '4px',
+                cursor: 'pointer',
+                alignSelf: 'center',
+                transition: 'all 0.2s ease'
+              }}
+              onMouseOver={(e) => e.currentTarget.style.background = 'rgba(255,255,255,0.2)'}
+              onMouseOut={(e) => e.currentTarget.style.background = 'rgba(255,255,255,0.1)'}
+            >
+              閉じる
+            </button>
+          </div>
+
+          <div style={{
+            position: 'absolute',
+            top: '40px', right: '40px',
+            color: 'rgba(255,255,255,0.4)',
+            fontSize: '12px',
+            textTransform: 'uppercase',
+            letterSpacing: '0.2em'
+          }}>
+            Click anywhere outside to close
+          </div>
+        </div>
+      )}
+
     </div>
   );
 }
