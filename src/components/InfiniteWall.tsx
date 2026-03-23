@@ -271,8 +271,9 @@ function generateMondrianLayout(width: number, height: number, isMobile: boolean
   return rects;
 }
 
-// Reuse geometry and material globally to save memory
+// --- Constants for materials ---
 const BOX_GEO = new THREE.BoxGeometry(1, 1, 1);
+const LIGHT_POS_V = new THREE.Vector3(...THEME.colors.directLightPos);
 
 // --- Deterministic Float Utility ---
 function getBlockFloat(idx: number, clock: number) {
@@ -305,7 +306,17 @@ function EmptyBlock({ rect }: { rect: Rect }) {
       scale={[rect.w, rect.h, 0.4]}
       geometry={BOX_GEO}
     >
-      <PaperMaterial ref={matRef} color={THEME.colors.blockEmpty} uGrainScale={40.0} uGrainIntensity={0.1} uLightIntensity={THEME.colors.cameraPointLightIntensity} />
+      <PaperMaterial 
+        ref={matRef} 
+        color={THEME.colors.blockEmpty} 
+        uGrainScale={40.0} 
+        uGrainIntensity={0.1} 
+        uLightIntensity={THEME.colors.cameraPointLightIntensity} 
+        uAmbientIntensity={THEME.colors.ambientLight}
+        uDirectLightIntensity={THEME.colors.directLight}
+        uDirectLightPos={LIGHT_POS_V}
+        uEnvironmentIntensity={THEME.colors.environmentIntensity}
+      />
     </mesh>
   );
 }
@@ -432,6 +443,10 @@ function WallBlock({ uid, rect, data, onClick, illustrationItem, onIllustrationC
         uGrainIntensity={showContent ? 0.2 : 0.1}
         uRoughness={0.6}
         uLightIntensity={THEME.colors.cameraPointLightIntensity}
+        uAmbientIntensity={THEME.colors.ambientLight}
+        uDirectLightIntensity={THEME.colors.directLight}
+        uDirectLightPos={LIGHT_POS_V}
+        uEnvironmentIntensity={THEME.colors.environmentIntensity}
         transparent
       />
       <group ref={overlaysRef} scale={[1/rect.w, 1/rect.h, 1]}>

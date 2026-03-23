@@ -54,7 +54,7 @@ function Scene({
     <>
       <ambientLight intensity={THEME.colors.ambientLight} />
       <directionalLight 
-        position={[2, 5, 5]} 
+        position={THEME.colors.directLightPos} 
         intensity={THEME.colors.directLight} 
       />
       <CameraPointLight />

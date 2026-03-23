@@ -8,8 +8,8 @@
 export const THEME = {
   // --- Layout Settings ---
   layout: {
-    tileWidth: 20,
-    tileHeight: 15,
+    tileWidth: 22,
+    tileHeight: 16,
     minBlockSize: 0.4,
     mobileThreshold: 768,
     // Macro-tile grid size (3x3 = 9 tiles around camera)
@@ -50,9 +50,10 @@ export const THEME = {
   colors: {
      background: '#ffffff',
     scenePlane: '#ffffff',
-    ambientLight: 0.7,
-    directLight: 0.8,
-    environmentIntensity: 0.6,
+    ambientLight: 0.2,
+    directLight: 0.65,
+    directLightPos: [2, 5, 5] as [number, number, number],
+    environmentIntensity: 0.2,
     
     // Block Materials
     blockDefault: '#99eaff',
@@ -68,8 +69,8 @@ export const THEME = {
     modalBackground: 'rgba(0,0,0,0.85)',
     overlayBackground: 'rgba(0,0,0,0.7)',
     overlayBorder: 'rgba(255,255,255,0.2)',
-    cameraPointLight: '#ffffff',
-    cameraPointLightIntensity: 1.5,
+    cameraPointLight: '#ddf6ff',
+    cameraPointLightIntensity: 0.2,
   },
 
   // --- Camera & Interaction ---

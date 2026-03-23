@@ -12,8 +12,12 @@ const PaperShaderMaterialImpl = shaderMaterial(
     uGrainScale: 40.0,
     uGrainIntensity: 0.15,
     uRoughness: 0.5,
-    uLightPos: new THREE.Vector3(5, 10, 12),
+    uLightPos: new THREE.Vector3(0, 0, 10),
     uLightIntensity: 1.0,
+    uAmbientIntensity: 0.5,
+    uDirectLightIntensity: 0.8,
+    uDirectLightPos: new THREE.Vector3(2, 5, 5),
+    uEnvironmentIntensity: 0.4,
   },
   // Vertex Shader
   `
@@ -44,6 +48,10 @@ const PaperShaderMaterialImpl = shaderMaterial(
     uniform float uRoughness;
     uniform vec3 uLightPos;
     uniform float uLightIntensity;
+    uniform float uAmbientIntensity;
+    uniform float uDirectLightIntensity;
+    uniform vec3 uDirectLightPos;
+    uniform float uEnvironmentIntensity;
     
     varying vec2 vUv;
     varying vec3 vWorldPosition;
@@ -100,25 +108,38 @@ const PaperShaderMaterialImpl = shaderMaterial(
       vec3 bumpNormal = normalize(vNormal + vec3(nx, ny, 0.0) * (uGrainIntensity * 2.5));
       
       // Lighting
-      vec3 lightDir = normalize(uLightPos - vWorldPosition);
+      // 1. Camera Point Light (uLightPos is camera position)
+      vec3 pointLightDir = normalize(uLightPos - vWorldPosition);
       float dist = length(uLightPos - vWorldPosition);
-      float atten = 1.0 / (1.0 + 0.1 * dist + 0.02 * dist * dist);
-      float diff = max(dot(bumpNormal, lightDir), 0.0);
+      float pointAtten = 1.0 / (1.0 + 0.1 * dist + 0.02 * dist * dist);
+      float pointDiff = max(dot(bumpNormal, pointLightDir), 0.0);
       
-      // Softer ambient base
-      float ambient = 0.65;
+      // 2. Scene Directional Light
+      vec3 directLightDir = normalize(uDirectLightPos);
+      float directDiff = max(dot(bumpNormal, directLightDir), 0.0);
+      
+      // 3. Environment Light (Simulate as a constant addition scaled by normal.z)
+      float environment = uEnvironmentIntensity * (bumpNormal.z * 0.5 + 0.5);
       
       // Color Variation (slightly more contrast in fractal peaks)
       float colorVar = 1.0 - (grain * uGrainIntensity * 0.6) - fibers;
       vec3 baseColor = uColor * colorVar;
       
       // Apply Shading
-      vec3 finalColor = baseColor * (diff * atten * uLightIntensity * (1.0 - ambient) + ambient);
+      vec3 finalLighting = vec3(0.0);
+      finalLighting += vec3(uAmbientIntensity); // Ambient
+      finalLighting += vec3(pointDiff * pointAtten * uLightIntensity); // Camera Point Light
+      finalLighting += vec3(directDiff * uDirectLightIntensity); // Scene Directional Light
+      finalLighting += vec3(environment); // Simulated Environment
       
-      // Subtle Specular Highlight
+      vec3 finalColor = baseColor * finalLighting;
+      
+      // Subtle Specular Highlight (Point Light)
       float shininess = mix(128.0, 8.0, uRoughness);
-      float spec = pow(max(dot(bumpNormal, normalize(uLightPos - vWorldPosition + vec3(0.0, 0.0, 1.0))), 0.0), shininess);
-      finalColor += spec * atten * uLightIntensity * (1.0 - uRoughness) * 0.12;
+      vec3 viewDir = normalize(vViewPosition);
+      vec3 halfWay = normalize(pointLightDir + viewDir);
+      float spec = pow(max(dot(bumpNormal, halfWay), 0.0), shininess);
+      finalColor += spec * pointAtten * uLightIntensity * (1.0 - uRoughness) * 0.12;
       
       gl_FragColor = vec4(finalColor, opacity);
     }
