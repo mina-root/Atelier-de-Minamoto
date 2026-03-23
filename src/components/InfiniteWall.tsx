@@ -5,6 +5,7 @@ import { Html, Image as DreiImage } from '@react-three/drei';
 import { aboutData, contentPoolData, requestTextDataArray, termsTextDataArray, type GridItemData, type IllustrationItem } from '../data';
 import { THEME } from '../theme';
 import { PaperMaterial } from './PaperMaterial';
+import { MetalMaterial } from './MetalMaterial';
 
 // --- Types & Constants ---
 interface Rect {
@@ -309,8 +310,9 @@ function EmptyBlock({ rect }: { rect: Rect }) {
       <PaperMaterial 
         ref={matRef} 
         color={THEME.colors.blockEmpty} 
-        uGrainScale={40.0} 
-        uGrainIntensity={0.1} 
+        uGrainScale={THEME.materials.paper.grainScale} 
+        uGrainIntensity={THEME.materials.paper.grainIntensity} 
+        uRoughness={THEME.materials.paper.roughness}
         uLightIntensity={THEME.colors.cameraPointLightIntensity} 
         uAmbientIntensity={THEME.colors.ambientLight}
         uDirectLightIntensity={THEME.colors.directLight}
@@ -436,12 +438,13 @@ function WallBlock({ uid, rect, data, onClick, illustrationItem, onIllustrationC
         document.body.style.cursor = 'auto'; 
       }}
     >
-      <PaperMaterial
+      <MetalMaterial
         ref={matRef}
         color={showContent ? (isThemedAbout ? THEME.colors.blockAbout : THEME.colors.blockDefault) : THEME.colors.blockEmpty}
-        uGrainScale={showContent ? 50.0 : 40.0}
-        uGrainIntensity={showContent ? 0.2 : 0.1}
-        uRoughness={0.6}
+        uGrainScale={showContent ? THEME.materials.metal.grainScale : THEME.materials.metalEmpty.grainScale}
+        uGrainIntensity={showContent ? THEME.materials.metal.grainIntensity : THEME.materials.metalEmpty.grainIntensity}
+        uRoughness={showContent ? THEME.materials.metal.roughness : THEME.materials.metalEmpty.roughness}
+        uMetalness={showContent ? THEME.materials.metal.metalness : THEME.materials.metalEmpty.metalness}
         uLightIntensity={THEME.colors.cameraPointLightIntensity}
         uAmbientIntensity={THEME.colors.ambientLight}
         uDirectLightIntensity={THEME.colors.directLight}

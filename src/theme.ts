@@ -50,10 +50,10 @@ export const THEME = {
   colors: {
      background: '#ffffff',
     scenePlane: '#ffffff',
-    ambientLight: 0.2,
-    directLight: 0.65,
+    ambientLight: 0.1,
+    directLight: 0.6,
     directLightPos: [2, 5, 5] as [number, number, number],
-    environmentIntensity: 0.2,
+    environmentIntensity: 0.7,
     
     // Block Materials
     blockDefault: '#99eaff',
@@ -70,7 +70,29 @@ export const THEME = {
     overlayBackground: 'rgba(0,0,0,0.7)',
     overlayBorder: 'rgba(255,255,255,0.2)',
     cameraPointLight: '#ddf6ff',
-    cameraPointLightIntensity: 0.2,
+    cameraPointLightIntensity: 0.1,
+  },
+
+  // --- Material Parameters ---
+  materials: {
+    paper: {
+      grainScale: 16.0,
+      grainIntensity: 0.3,
+      roughness: 0.6,
+    },
+    metal: {
+      grainScale: 120.0,
+      grainIntensity: 0.25,
+      roughness: 0.1,
+      metalness: 0.9,
+    },
+    // Background blocks (Empty) use milder metal settings in WallBlock
+    metalEmpty: {
+      grainScale: 80.0,
+      grainIntensity: 0.5,
+      roughness: 0.5,
+      metalness: 0.15,
+    }
   },
 
   // --- Camera & Interaction ---
