@@ -525,12 +525,12 @@ function AboutIcon() {
   );
 }
 
- function AcrylicKeyHolder({ position }: { position: [number, number, number] }) {
+ function AcrylicKeyHolder({ position, iconUrl, logoUrl, linkUrl, iconSize = [0.8, 0.8] }: { position: [number, number, number], iconUrl: string, logoUrl?: string, linkUrl: string, iconSize?: [number, number] }) {
   const groupRef = useRef<THREE.Group>(null);
   const logoGroupRef = useRef<THREE.Group>(null);
   
-  const iconTex = useMemo(() => new THREE.TextureLoader().load('/pixiv_icon.png'), []);
-  const logoTex = useMemo(() => new THREE.TextureLoader().load('/pixiv_logo.png'), []);
+  const iconTex = useMemo(() => new THREE.TextureLoader().load(iconUrl), [iconUrl]);
+  const logoTex = useMemo(() => logoUrl ? new THREE.TextureLoader().load(logoUrl) : null, [logoUrl]);
 
   useFrame(({ clock }) => {
     const t = clock.elapsedTime;
@@ -550,54 +550,62 @@ function AboutIcon() {
       map={tex}
       transparent
       alphaTest={0.1}
-      roughness={0.05} // Slightly smoother
+      roughness={0.05}
       metalness={0.05}
-      transmission={0.9} // Higher transparency
+      transmission={0.9}
       thickness={0.05}
-      ior={1.49} // Real acrylic index of refraction
-      clearcoat={1.0} // Shiny outer shell
-      clearcoatRoughness={0.0} // Perfect reflection
-      envMapIntensity={1.5} // Boost reflections
+      ior={1.49}
+      clearcoat={1.0}
+      clearcoatRoughness={0.0}
+      envMapIntensity={1.5}
     />
   );
 
   return (
-    <group position={position}>
-      {/* Wall Hook (Protrusion) */}
-      <mesh position={[0, 0, -0.25]}>
-        <boxGeometry args={[0.1, 0.1, 0.5]} />
-        <meshStandardMaterial color="#888" metalness={0.8} roughness={0.2} />
-      </mesh>
-
-      {/* Main swinging group (pivoted at top) */}
-      <group ref={groupRef} position={[0, -0.1, 0]}>
-        {/* Top Ring */}
-        <mesh position={[0, 0, 0]} rotation={[Math.PI / 2, 0, 0]}>
-          <torusGeometry args={[0.08, 0.015, 16, 32]} />
-          <meshStandardMaterial color="#ccc" metalness={0.9} roughness={0.1} />
+    <group 
+      position={position}
+      onPointerOver={(e) => { e.stopPropagation(); document.body.style.cursor = 'pointer'; }}
+      onPointerOut={() => { document.body.style.cursor = 'auto'; }}
+      onClick={(e) => { e.stopPropagation(); window.open(linkUrl, '_blank'); }}
+    >
+      <group scale={0.6}>
+        {/* Wall Hook (Protrusion) */}
+        <mesh position={[0, 0, -0.6]}>
+          <boxGeometry args={[0.1, 0.1, 1.2]} />
+          <meshStandardMaterial color="#888" metalness={0.8} roughness={0.2} />
         </mesh>
 
-        {/* Icon Block */}
-        <mesh position={[0, -0.5, 0]}>
-          <boxGeometry args={[0.8, 0.8, 0.05]} />
-          {acrylicMat(iconTex)}
-        </mesh>
-
-        {/* Connection Ring */}
-        <group position={[0, -0.9, 0]}>
-          <mesh rotation={[Math.PI / 2, 0, 0]}>
-            <torusGeometry args={[0.06, 0.012, 16, 32]} />
+        {/* Main swinging group (pivoted at top) */}
+        <group ref={groupRef} position={[0, -0.1, 0]}>
+          {/* Top Ring */}
+          <mesh position={[0, 0, 0]} rotation={[Math.PI / 2, 0, 0]}>
+            <torusGeometry args={[0.08, 0.015, 16, 32]} />
             <meshStandardMaterial color="#ccc" metalness={0.9} roughness={0.1} />
           </mesh>
 
-          {/* Logo swinging group */}
-          <group ref={logoGroupRef} position={[0, -0.1, 0]}>
-            {/* Logo Block */}
-            <mesh position={[0, -0.4, 0]}>
-              <boxGeometry args={[1.2, 0.45, 0.05]} />
-              {acrylicMat(logoTex)}
-            </mesh>
-          </group>
+          {/* Icon Block */}
+          <mesh position={[0, -iconSize[1] / 2 - 0.1, 0]}>
+            <boxGeometry args={[iconSize[0], iconSize[1], 0.05]} />
+            {acrylicMat(iconTex)}
+          </mesh>
+
+          {logoTex && (
+            <group position={[0, -iconSize[1] - 0.1, 0]}>
+              <mesh rotation={[Math.PI / 2, 0, 0]}>
+                <torusGeometry args={[0.06, 0.012, 16, 32]} />
+                <meshStandardMaterial color="#ccc" metalness={0.9} roughness={0.1} />
+              </mesh>
+
+              {/* Logo swinging group */}
+              <group ref={logoGroupRef} position={[0, -0.1, 0]}>
+                {/* Logo Block */}
+                <mesh position={[0, -0.4, 0]}>
+                  <boxGeometry args={[1.2, 0.45, 0.05]} />
+                  {acrylicMat(logoTex)}
+                </mesh>
+              </group>
+            </group>
+          )}
         </group>
       </group>
     </group>
@@ -681,7 +689,18 @@ export function InfiniteWall({
           );
         })}
         {/* Static decorative elements - displayed once per tile but they loop with the wall */}
-        <AcrylicKeyHolder position={[3, 2, 0.2]} />
+        <AcrylicKeyHolder 
+          position={isMobile ? [-0.4, -3.2, 1.0] : [1.1, -2.7, 1.0]} 
+          iconUrl="/pixiv_icon.png" 
+          logoUrl="/pixiv_logo.png" 
+          linkUrl="https://www.pixiv.net/users/87371443" 
+        />
+        <AcrylicKeyHolder 
+          position={isMobile ? [0.6, -3.2, 1.0] : [1.9, -2.7, 1.0]} 
+          iconUrl="/skeb.svg" 
+          linkUrl="https://skeb.jp/@mina_Root" 
+          iconSize={[2.66, 0.8]}
+        />
       </group>
     );
 
