@@ -4,6 +4,7 @@ import * as THREE from 'three';
 import { Html, Image as DreiImage } from '@react-three/drei';
 import { aboutData, contentPoolData, requestTextDataArray, termsTextDataArray, type GridItemData, type IllustrationItem } from '../data';
 import { THEME } from '../theme';
+import { PaperMaterial } from './PaperMaterial';
 
 // --- Types & Constants ---
 interface Rect {
@@ -272,10 +273,6 @@ function generateMondrianLayout(width: number, height: number, isMobile: boolean
 
 // Reuse geometry and material globally to save memory
 const BOX_GEO = new THREE.BoxGeometry(1, 1, 1);
-const EMPTY_MAT = new THREE.MeshStandardMaterial({ 
-  color: THEME.colors.blockEmpty, 
-  roughness: 0.5 
-});
 
 // --- Deterministic Float Utility ---
 function getBlockFloat(idx: number, clock: number) {
@@ -289,17 +286,27 @@ function getBlockFloat(idx: number, clock: number) {
   };
 }
 
-// --- Component: EmptyBlock (lightweight - no useFrame) ---
 function EmptyBlock({ rect }: { rect: Rect }) {
+  const meshRef = useRef<THREE.Mesh>(null);
+  const matRef = useRef<any>(null);
   const cx = rect.x + rect.w / 2;
   const cy = rect.y + rect.h / 2;
+
+  useFrame(({ camera }) => {
+    if (matRef.current?.uniforms) {
+      matRef.current.uniforms.uLightPos.value.copy(camera.position);
+    }
+  });
+
   return (
     <mesh 
+      ref={meshRef}
       position={[cx, cy, -rect.depthOffset + 0.2]} 
       scale={[rect.w, rect.h, 0.4]}
       geometry={BOX_GEO}
-      material={EMPTY_MAT}
-    />
+    >
+      <PaperMaterial ref={matRef} color={THEME.colors.blockEmpty} uGrainScale={40.0} uGrainIntensity={0.1} uLightIntensity={THEME.colors.cameraPointLightIntensity} />
+    </mesh>
   );
 }
 
@@ -317,7 +324,7 @@ interface WallBlockProps {
 
 function WallBlock({ uid, rect, data, onClick, illustrationItem, onIllustrationClick, onTextClick, isModalOpen }: WallBlockProps) {
   const meshRef = useRef<THREE.Mesh>(null);
-  const matRef = useRef<THREE.MeshStandardMaterial>(null);
+  const matRef = useRef<any>(null);
   const overlaysRef = useRef<THREE.Group>(null);
   const [hovered, setHovered] = useState(false);
   const opacityRef = useRef(0);
@@ -344,7 +351,7 @@ function WallBlock({ uid, rect, data, onClick, illustrationItem, onIllustrationC
   const showContent = isContentHost;
   const targetOpacity = showContent ? 1 : 0;
 
-  useFrame(({ clock }) => {
+  useFrame(({ camera, clock }) => {
     if (!meshRef.current) return;
     const fPos = 0.1, fSca = 0.15, fOpa = 0.2;
 
@@ -364,6 +371,9 @@ function WallBlock({ uid, rect, data, onClick, illustrationItem, onIllustrationC
 
     opacityRef.current = THREE.MathUtils.lerp(opacityRef.current, targetOpacity, fOpa);
     if (matRef.current) {
+      if (matRef.current.uniforms) {
+        matRef.current.uniforms.uLightPos.value.copy(camera.position);
+      }
       matRef.current.opacity = opacityRef.current;
       matRef.current.transparent = true;
     }
@@ -415,11 +425,13 @@ function WallBlock({ uid, rect, data, onClick, illustrationItem, onIllustrationC
         document.body.style.cursor = 'auto'; 
       }}
     >
-      <meshStandardMaterial
+      <PaperMaterial
         ref={matRef}
         color={showContent ? (isThemedAbout ? THEME.colors.blockAbout : THEME.colors.blockDefault) : THEME.colors.blockEmpty}
-        roughness={0.3}
-        metalness={0.05}
+        uGrainScale={showContent ? 50.0 : 40.0}
+        uGrainIntensity={showContent ? 0.2 : 0.1}
+        uRoughness={0.6}
+        uLightIntensity={THEME.colors.cameraPointLightIntensity}
         transparent
       />
       <group ref={overlaysRef} scale={[1/rect.w, 1/rect.h, 1]}>

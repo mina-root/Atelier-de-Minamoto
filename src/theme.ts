@@ -50,9 +50,9 @@ export const THEME = {
   colors: {
      background: '#ffffff',
     scenePlane: '#ffffff',
-    ambientLight: 0.8,
-    directLight: 1.0,
-    environmentIntensity: 0.7,
+    ambientLight: 0.7,
+    directLight: 0.8,
+    environmentIntensity: 0.6,
     
     // Block Materials
     blockDefault: '#99eaff',
@@ -68,6 +68,8 @@ export const THEME = {
     modalBackground: 'rgba(0,0,0,0.85)',
     overlayBackground: 'rgba(0,0,0,0.7)',
     overlayBorder: 'rgba(255,255,255,0.2)',
+    cameraPointLight: '#ffffff',
+    cameraPointLightIntensity: 1.5,
   },
 
   // --- Camera & Interaction ---

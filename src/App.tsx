@@ -3,6 +3,7 @@ import { Environment } from '@react-three/drei';
 import { Suspense, useEffect, useState } from 'react';
 import * as THREE from 'three';
 import { CameraController } from './components/CameraController';
+import { CameraPointLight } from './components/CameraPointLight';
 import { InfiniteWall } from './components/InfiniteWall';
 import { type IllustrationItem } from './data';
 import { THEME } from './theme';
@@ -51,12 +52,13 @@ function Scene({
 }) {
   return (
     <>
-      <ambientLight intensity={1.2} />
+      <ambientLight intensity={THEME.colors.ambientLight} />
       <directionalLight 
         position={[2, 5, 5]} 
         intensity={THEME.colors.directLight} 
       />
-      <Environment preset="city" />
+      <CameraPointLight />
+      <Environment preset="city" environmentIntensity={THEME.colors.environmentIntensity} />
 
       
       {/* Background Plane */}
