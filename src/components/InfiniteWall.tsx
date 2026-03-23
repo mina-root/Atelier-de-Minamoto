@@ -525,7 +525,86 @@ function AboutIcon() {
   );
 }
 
- // --- Main Component: InfiniteWall ---
+ function AcrylicKeyHolder({ position }: { position: [number, number, number] }) {
+  const groupRef = useRef<THREE.Group>(null);
+  const logoGroupRef = useRef<THREE.Group>(null);
+  
+  const iconTex = useMemo(() => new THREE.TextureLoader().load('/pixiv_icon.png'), []);
+  const logoTex = useMemo(() => new THREE.TextureLoader().load('/pixiv_logo.png'), []);
+
+  useFrame(({ clock }) => {
+    const t = clock.elapsedTime;
+    if (groupRef.current) {
+      // Main sway
+      groupRef.current.rotation.z = Math.sin(t * 1.5) * 0.15;
+      groupRef.current.rotation.x = Math.sin(t * 0.8) * 0.05;
+    }
+    if (logoGroupRef.current) {
+      // Secondary sway for the logo part
+      logoGroupRef.current.rotation.z = Math.sin(t * 2.0) * 0.1;
+    }
+  });
+
+  const acrylicMat = (tex: THREE.Texture) => (
+    <meshPhysicalMaterial 
+      map={tex}
+      transparent
+      alphaTest={0.1}
+      roughness={0.05} // Slightly smoother
+      metalness={0.05}
+      transmission={0.9} // Higher transparency
+      thickness={0.05}
+      ior={1.49} // Real acrylic index of refraction
+      clearcoat={1.0} // Shiny outer shell
+      clearcoatRoughness={0.0} // Perfect reflection
+      envMapIntensity={1.5} // Boost reflections
+    />
+  );
+
+  return (
+    <group position={position}>
+      {/* Wall Hook (Protrusion) */}
+      <mesh position={[0, 0, -0.25]}>
+        <boxGeometry args={[0.1, 0.1, 0.5]} />
+        <meshStandardMaterial color="#888" metalness={0.8} roughness={0.2} />
+      </mesh>
+
+      {/* Main swinging group (pivoted at top) */}
+      <group ref={groupRef} position={[0, -0.1, 0]}>
+        {/* Top Ring */}
+        <mesh position={[0, 0, 0]} rotation={[Math.PI / 2, 0, 0]}>
+          <torusGeometry args={[0.08, 0.015, 16, 32]} />
+          <meshStandardMaterial color="#ccc" metalness={0.9} roughness={0.1} />
+        </mesh>
+
+        {/* Icon Block */}
+        <mesh position={[0, -0.5, 0]}>
+          <boxGeometry args={[0.8, 0.8, 0.05]} />
+          {acrylicMat(iconTex)}
+        </mesh>
+
+        {/* Connection Ring */}
+        <group position={[0, -0.9, 0]}>
+          <mesh rotation={[Math.PI / 2, 0, 0]}>
+            <torusGeometry args={[0.06, 0.012, 16, 32]} />
+            <meshStandardMaterial color="#ccc" metalness={0.9} roughness={0.1} />
+          </mesh>
+
+          {/* Logo swinging group */}
+          <group ref={logoGroupRef} position={[0, -0.1, 0]}>
+            {/* Logo Block */}
+            <mesh position={[0, -0.4, 0]}>
+              <boxGeometry args={[1.2, 0.45, 0.05]} />
+              {acrylicMat(logoTex)}
+            </mesh>
+          </group>
+        </group>
+      </group>
+    </group>
+  );
+}
+
+// --- Main Component: InfiniteWall ---
 export function InfiniteWall({ 
   onIllustrationClick, 
   onTextClick,
@@ -601,8 +680,11 @@ export function InfiniteWall({
             />
           );
         })}
+        {/* Static decorative elements - displayed once per tile but they loop with the wall */}
+        <AcrylicKeyHolder position={[3, 2, 0.2]} />
       </group>
     );
+
   };
 
   return (

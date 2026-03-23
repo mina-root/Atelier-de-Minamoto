@@ -1,4 +1,5 @@
 import { Canvas, useThree } from '@react-three/fiber';
+import { Environment } from '@react-three/drei';
 import { Suspense, useEffect, useState } from 'react';
 import * as THREE from 'three';
 import { CameraController } from './components/CameraController';
@@ -55,6 +56,8 @@ function Scene({
         position={[2, 5, 5]} 
         intensity={THEME.colors.directLight} 
       />
+      <Environment preset="city" />
+
       
       {/* Background Plane */}
       <mesh position={[0, 0, -2]}>
