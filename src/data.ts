@@ -32,10 +32,10 @@ export interface GridItemData {
 // ローカルの画像を使う場合は、"public/illustrations/" フォルダ内に画像を配置し、
 // srcの値を "/illustrations/ファイル名.png" などのように指定してください。
 export const illustrationsData: IllustrationItem[] = [
-  { id: "illus-1", src: "/illustrations/Outpost_Dissonance.jpg", title: "Outpost:Dissonance", caption: "楽曲『Outpost:Dissonance』ジャケット", aspectRatio: 1.0 },
+  { id: "illus-1", src: "/illustrations/Outpost_Dissonance.jpg", title: "Outpost:Dissonance -advance- ジャケット", caption: "楽曲『Outpost:Dissonance』ジャケット", aspectRatio: 1.0 },
   { id: "illus-2", src: "/illustrations/a_grain.png", title: "a grain", aspectRatio: 0.9949 },
   { id: "illus-3", src: "/illustrations/dropsound.jpg", title: "dropsound", aspectRatio: 1.5175 },
-  { id: "illus-4", src: "/illustrations/magsafeangel.jpg", title: "magsafeangel", aspectRatio: 0.4766 },
+  { id: "illus-4", src: "/illustrations/magsafeangel.jpg", title: "MagsafeAngel", aspectRatio: 0.4766 },
   { id: "illus-5", src: "/illustrations/向こう側.png", title: "向こう側", aspectRatio: 0.4614 },
   { id: "illus-6", src: "/illustrations/拡散する未来.png", title: "拡散する未来", aspectRatio: 1.6667 },
   { id: "illus-7", src: "/illustrations/浮遊.png", title: "浮遊", aspectRatio: 0.4619 },
@@ -51,7 +51,7 @@ export const discographyData: IllustrationItem[] = [
     type: "soundcloud",
     trackId: "2284551407",
     src: "/illustrations/Outpost_Dissonance.jpg",
-    title: "Outpost:Dissonance",
+    title: "Outpost:Dissonance  -advance-",
     caption: "SoundCloud: Outpost:Dissonance (Advance)",
     aspectRatio: 3.0
   },
@@ -124,7 +124,7 @@ illustrationsData.forEach((illus, i) => {
     desc: {
       id: `illus-d-${i}`,
       type: 'about_text',
-      description: illus.caption || illus.title,
+      description: illus.title || illus.caption,
       width: 1.2,
       height: 1.0,
       depthOffset: Math.random() * 0.3
@@ -149,7 +149,7 @@ discographyData.forEach((song, i) => {
     desc: {
       id: `song-d-${i}`,
       type: 'about_text',
-      description: song.caption || song.title,
+      description: song.title || song.caption,
       width: 1.2,
       height: 1.0,
       depthOffset: Math.random() * 0.3
@@ -230,8 +230,8 @@ export const requestTextDataArray: GridItemData[] = [
     type: 'about_text',
     title: 'ご依頼について',
     description: requestFullText,
-    width: 3.0,
-    height: 1.2,
+    width: 1.8,
+    height: 0.7,
     depthOffset: 0.1
   }
 ];
@@ -242,8 +242,8 @@ export const termsTextDataArray: GridItemData[] = [
     type: 'about_text',
     title: '制作物の利用について',
     description: termsFullText,
-    width: 3.5,
-    height: 1.2,
+    width: 2.4,
+    height: 0.7,
     depthOffset: 0.1
   }
 ];

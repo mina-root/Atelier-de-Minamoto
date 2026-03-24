@@ -44,6 +44,10 @@ function generateMondrianLayout(width: number, height: number, isMobile: boolean
   prePlaced.push({ x: about.name.x, y: about.name.y, w: about.name.w, h: about.name.h, dataIndex: 0, depthOffset: about.name.depth, isContentEligible: false });
   prePlaced.push({ x: about.text.x, y: about.text.y, w: about.text.w, h: about.text.h, dataIndex: 2, depthOffset: about.text.depth, isContentEligible: false });
 
+  const akkeyRes = isMobile 
+    ? { x: -2.0, y: -3.2, w: 4.0, h: 1.2 } 
+    : { x: -2.3, y: -3.0, w: 4.6, h: 1.4 };
+
   if (!isMobile) {
     const desktopAbout = THEME.aboutDesktop;
     if (desktopAbout.filler) {
@@ -157,6 +161,9 @@ function generateMondrianLayout(width: number, height: number, isMobile: boolean
           overlap = true;
           break;
         }
+      }
+      if (!overlap && combined.some(r => checkWrap(r, akkeyRes as Rect))) {
+        overlap = true;
       }
 
       if (!overlap) {
@@ -300,16 +307,18 @@ function EmptyBlock({ rect }: { rect: Rect }) {
     }
   });
 
+  const color = (rect.dataIndex % 4 === 0) ? (THEME.colors as any).blockEmptyAccent : THEME.colors.blockEmpty;
+
   return (
     <mesh 
       ref={meshRef}
-      position={[cx, cy, -rect.depthOffset + 0.2]} 
-      scale={[rect.w, rect.h, 0.4]}
+      position={[cx, cy, -rect.depthOffset - 1.1]} // Adjusted center for 3.0 thickness (front stays at -rect.depthOffset + 0.4)
+      scale={[rect.w, rect.h, 3.0]}
       geometry={BOX_GEO}
     >
       <PaperMaterial 
         ref={matRef} 
-        color={THEME.colors.blockEmpty} 
+        color={color} 
         uGrainScale={THEME.materials.paper.grainScale} 
         uGrainIntensity={THEME.materials.paper.grainIntensity} 
         uRoughness={THEME.materials.paper.roughness}
@@ -339,6 +348,7 @@ function WallBlock({ uid, rect, data, onClick, illustrationItem, onIllustrationC
   const meshRef = useRef<THREE.Mesh>(null);
   const matRef = useRef<any>(null);
   const overlaysRef = useRef<THREE.Group>(null);
+  const pointerDownPos = useRef<{ x: number, y: number } | null>(null);
   const [hovered, setHovered] = useState(false);
   const opacityRef = useRef(0);
 
@@ -347,17 +357,13 @@ function WallBlock({ uid, rect, data, onClick, illustrationItem, onIllustrationC
   const isInteractive = data.type !== 'empty';
   const isLargeText = data.id?.startsWith('text-request') || data.id?.startsWith('text-terms');
 
-  const { offset: fOff } = getBlockFloat(rect.dataIndex, 0); // initial offset for deterministic setup
   let targetScaleZ = 1;
-  let targetZOffset = 0;
 
   if (isContentHost && !isProfileAbout) {
     targetScaleZ = 1.15;
-    targetZOffset = fOff;
-    if (hovered && isInteractive && !isModalOpen) targetZOffset += 0.1;
+    if (hovered && isInteractive && !isModalOpen) targetScaleZ += 0.1; // adding some feel
   } else if (hovered && isInteractive && !isModalOpen) {
     targetScaleZ = 1.3;
-    targetZOffset = 0.2;
   }
 
   const isThemedAbout = isProfileAbout || isLargeText; 
@@ -368,7 +374,7 @@ function WallBlock({ uid, rect, data, onClick, illustrationItem, onIllustrationC
     if (!meshRef.current) return;
     const fPos = 0.1, fSca = 0.15, fOpa = 0.2;
 
-    const finalTargetScaleZ = 0.4 * targetScaleZ;
+    const finalTargetScaleZ = 3.0 * targetScaleZ;
     meshRef.current.scale.z = THREE.MathUtils.lerp(meshRef.current.scale.z, finalTargetScaleZ, fSca);
 
     let zFloating = 0;
@@ -379,7 +385,8 @@ function WallBlock({ uid, rect, data, onClick, illustrationItem, onIllustrationC
     const zOff = (isContentHost && !isProfileAbout) ? fOff : (hovered ? 0.2 : 0);
 
     const thickness = meshRef.current.scale.z;
-    const targetZ = -rect.depthOffset + zOff + zFloating + thickness / 2;
+    // Position adjusted so front face remains consistent while block extends deep into background
+    const targetZ = -rect.depthOffset + zOff + zFloating + 0.4 - (thickness / 2);
     meshRef.current.position.z = THREE.MathUtils.lerp(meshRef.current.position.z, targetZ, fPos);
 
     opacityRef.current = THREE.MathUtils.lerp(opacityRef.current, targetOpacity, fOpa);
@@ -405,17 +412,27 @@ function WallBlock({ uid, rect, data, onClick, illustrationItem, onIllustrationC
   const cx = rect.x + rect.w / 2;
   const cy = rect.y + rect.h / 2;
 
-  // We change the scale format depending on whether it's a huge request text box, or a tiny illustration caption
-  // const isLargeText = data.id?.startsWith('text-request') || data.id?.startsWith('text-terms'); // Moved to top
-
   return (
     <mesh
       ref={meshRef}
       position={[cx, cy, 0]}
-      scale={[rect.w, rect.h, 0.4]} // Initialize with base thickness
+      scale={[rect.w, rect.h, 0.4]} 
       geometry={BOX_GEO}
+      onPointerDown={(e) => {
+        if (!isInteractive || isModalOpen) return;
+        pointerDownPos.current = { x: e.clientX, y: e.clientY };
+      }}
       onClick={(e) => {
         if (!isInteractive || isModalOpen) return;
+        
+        // Threshold check: prevent click if cursor moved significantly
+        if (pointerDownPos.current) {
+          const dx = e.clientX - pointerDownPos.current.x;
+          const dy = e.clientY - pointerDownPos.current.y;
+          const dist = Math.sqrt(dx * dx + dy * dy);
+          if (dist > 10) return;
+        }
+
         e.stopPropagation();
 
         if (illustrationItem && (illustrationItem.type === 'image' || !illustrationItem.type)) {
@@ -529,7 +546,8 @@ function IndependentEmbed({ rect, data, illustrationItem }: { rect: Rect, data: 
         <Html transform position={[0, 0, 0]} scale={isProfileAbout ? 1 : 0.2} distanceFactor={isProfileAbout ? 1.2 : undefined} pointerEvents="none" className="wall-html-content">
           <div style={{ 
             color: '#111', textAlign: (isProfileAbout || isLargeText) ? 'center' : 'left', fontWeight: isLargeText ? 700 : 400,
-            fontSize: isProfileAbout ? '20px' : (isLargeText ? '24px' : '18px'), 
+            fontSize: isProfileAbout ? '20px' : (isLargeText ? '32px' : '26px'), 
+            fontFamily: isProfileAbout ? 'inherit' : "'DotGothic16', sans-serif",
             width: isProfileAbout ? '400px' : `${rect.w * 200}px`, height: isProfileAbout ? 'auto' : `${rect.h * 200}px`,
             whiteSpace: 'pre-wrap', lineHeight: 1.6, overflowY: 'hidden', padding: isProfileAbout ? '0' : '20px', display: 'flex', alignItems: 'center', justifyContent: 'center', boxSizing: 'border-box'
           }}>
@@ -555,23 +573,25 @@ function AboutIcon() {
   );
 }
 
- function AcrylicKeyHolder({ position, iconUrl, logoUrl, linkUrl, iconSize = [0.8, 0.8] }: { position: [number, number, number], iconUrl: string, logoUrl?: string, linkUrl: string, iconSize?: [number, number] }) {
+ function AcrylicKeyHolder({ position, iconUrl, logoUrl, linkUrl, iconSize = [0.8, 0.8], timeOffset = 0 }: { position: [number, number, number], iconUrl: string, logoUrl?: string, linkUrl: string, iconSize?: [number, number], timeOffset?: number }) {
   const groupRef = useRef<THREE.Group>(null);
   const logoGroupRef = useRef<THREE.Group>(null);
+  const pointerDownPos = useRef<{ x: number, y: number } | null>(null);
   
   const iconTex = useMemo(() => new THREE.TextureLoader().load(iconUrl), [iconUrl]);
   const logoTex = useMemo(() => logoUrl ? new THREE.TextureLoader().load(logoUrl) : null, [logoUrl]);
 
   useFrame(({ clock }) => {
-    const t = clock.elapsedTime;
+    const t = clock.elapsedTime + timeOffset;
     if (groupRef.current) {
-      // Main sway
+      // Main sway - side-to-side and depth
       groupRef.current.rotation.z = Math.sin(t * 1.5) * 0.15;
-      groupRef.current.rotation.x = Math.sin(t * 0.8) * 0.05;
+      groupRef.current.rotation.x = Math.sin(t * 0.8) * 0.12; // Increased depth sway
     }
     if (logoGroupRef.current) {
       // Secondary sway for the logo part
-      logoGroupRef.current.rotation.z = Math.sin(t * 2.0) * 0.1;
+      logoGroupRef.current.rotation.z = Math.sin(t * 2.2) * 0.12;
+      logoGroupRef.current.rotation.x = Math.sin(t * 1.2) * 0.08;
     }
   });
 
@@ -580,14 +600,14 @@ function AboutIcon() {
       map={tex}
       transparent
       alphaTest={0.1}
-      roughness={0.05}
-      metalness={0.05}
-      transmission={0.9}
+      roughness={0.02}
+      metalness={0.1} // Slightly more reflective
+      transmission={0.95}
       thickness={0.05}
       ior={1.49}
       clearcoat={1.0}
       clearcoatRoughness={0.0}
-      envMapIntensity={1.5}
+      envMapIntensity={2.0} // Increased luster
     />
   );
 
@@ -596,13 +616,25 @@ function AboutIcon() {
       position={position}
       onPointerOver={(e) => { e.stopPropagation(); document.body.style.cursor = 'pointer'; }}
       onPointerOut={() => { document.body.style.cursor = 'auto'; }}
-      onClick={(e) => { e.stopPropagation(); window.open(linkUrl, '_blank'); }}
+      onPointerDown={(e) => {
+        pointerDownPos.current = { x: e.clientX, y: e.clientY };
+      }}
+      onClick={(e) => { 
+        if (pointerDownPos.current) {
+          const dx = e.clientX - pointerDownPos.current.x;
+          const dy = e.clientY - pointerDownPos.current.y;
+          const dist = Math.sqrt(dx * dx + dy * dy);
+          if (dist > 10) return;
+        }
+        e.stopPropagation(); 
+        window.open(linkUrl, '_blank'); 
+      }}
     >
-      <group scale={0.6}>
-        {/* Wall Hook (Protrusion) */}
-        <mesh position={[0, 0, -0.6]}>
-          <boxGeometry args={[0.1, 0.1, 1.2]} />
-          <meshStandardMaterial color="#888" metalness={0.8} roughness={0.2} />
+      <group scale={0.48}> {/* Smaller scale as requested */}
+        {/* Wall Hook (Protrusion) - Deep cylinder to prevent gaps */}
+        <mesh position={[0, 0, -2.0]} rotation={[Math.PI / 2, 0, 0]}>
+          <cylinderGeometry args={[0.05, 0.05, 4.0, 16]} />
+          <meshStandardMaterial color="#b3f0ff" metalness={0.8} roughness={0.2} />
         </mesh>
 
         {/* Main swinging group (pivoted at top) */}
@@ -720,16 +752,24 @@ export function InfiniteWall({
         })}
         {/* Static decorative elements - displayed once per tile but they loop with the wall */}
         <AcrylicKeyHolder 
-          position={isMobile ? [-0.4, -3.2, 1.0] : [1.1, -2.7, 1.0]} 
+          position={isMobile ? [-1.0, -2.2, 1.1] : [0.0, -1.8, 1.2]} 
+          iconUrl="/x_logo.png" 
+          linkUrl="https://x.com/mina_Root" 
+          timeOffset={0}
+        />
+        <AcrylicKeyHolder 
+          position={isMobile ? [0.0, -2.2, 0.9] : [1.0, -1.8, 1.0]} 
           iconUrl="/pixiv_icon.png" 
           logoUrl="/pixiv_logo.png" 
           linkUrl="https://www.pixiv.net/users/87371443" 
+          timeOffset={0.5}
         />
         <AcrylicKeyHolder 
-          position={isMobile ? [0.6, -3.2, 1.0] : [1.9, -2.7, 1.0]} 
+          position={isMobile ? [1.0, -2.2, 1.3] : [2.0, -1.8, 0.8]} 
           iconUrl="/skeb.svg" 
           linkUrl="https://skeb.jp/@mina_Root" 
           iconSize={[2.66, 0.8]}
+          timeOffset={1.0}
         />
       </group>
     );

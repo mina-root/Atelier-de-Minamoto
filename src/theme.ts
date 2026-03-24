@@ -50,39 +50,40 @@ export const THEME = {
   colors: {
      background: '#ffffff',
     scenePlane: '#ffffff',
-    ambientLight: 0.1,
-    directLight: 0.6,
+    ambientLight: 0.5,
+    directLight: 0.3,
     directLightPos: [2, 5, 5] as [number, number, number],
-    environmentIntensity: 0.7,
+    environmentIntensity: 0.42,
     
     // Block Materials
-    blockDefault: '#99eaff',
+    blockDefault: '#b8c5ff',
     blockHover: '#b3f0ff',
-    blockEmpty: '#ffffff',
-    blockAbout: '#99eaff',
+    blockEmpty: '#f0f0ff',
+    blockEmptyAccent: '#e1eaff', // うすい水色
+    blockAbout: '#99e0ffff',
     
     // UI & Text
     textPrimary: '#ffffff',
     textSecondary: '#444444',
     textMuted: '#aaaaaa',
-    accent: '#00aaff',
+    accent: '#1e00ff',
     modalBackground: 'rgba(0,0,0,0.85)',
     overlayBackground: 'rgba(0,0,0,0.7)',
     overlayBorder: 'rgba(255,255,255,0.2)',
     cameraPointLight: '#ddf6ff',
-    cameraPointLightIntensity: 0.1,
+    cameraPointLightIntensity: 0.14,
   },
 
   // --- Material Parameters ---
   materials: {
     paper: {
-      grainScale: 16.0,
-      grainIntensity: 0.3,
-      roughness: 0.6,
+      grainScale: 20.0,
+      grainIntensity: 0.15,
+      roughness: 0.1,
     },
     metal: {
       grainScale: 120.0,
-      grainIntensity: 0.25,
+      grainIntensity: 0.2,
       roughness: 0.1,
       metalness: 0.9,
     },
@@ -98,7 +99,7 @@ export const THEME = {
   // --- Camera & Interaction ---
   camera: {
     initialZ: 8,
-    fov: 40,
+    fov: 42,
     wheelSensitivity: 0.01,
     dragSensitivity: 0.02,
   },
