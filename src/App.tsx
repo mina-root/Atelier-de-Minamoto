@@ -1,6 +1,6 @@
-import { Canvas, useThree } from '@react-three/fiber';
+import { Canvas, useThree, useFrame } from '@react-three/fiber';
 import { Environment } from '@react-three/drei';
-import { Suspense, useEffect, useState } from 'react';
+import { Suspense, useEffect, useState, useRef } from 'react';
 import * as THREE from 'three';
 import { CameraController } from './components/CameraController';
 import { CameraPointLight } from './components/CameraPointLight';
@@ -50,19 +50,45 @@ function Scene({
   onTextClick: (title: string, content: string) => void,
   isModalOpen: boolean 
 }) {
+  const { camera } = useThree();
+  const lightRef = useRef<THREE.DirectionalLight>(null);
+
+  useFrame(() => {
+    if (lightRef.current) {
+      // Light follows camera on XY to maintain shadow coverage on the infinite wall
+      lightRef.current.position.set(
+        camera.position.x + THEME.colors.directLightPos[0],
+        camera.position.y + THEME.colors.directLightPos[1],
+        THEME.colors.directLightPos[2]
+      );
+      lightRef.current.target.position.set(camera.position.x, camera.position.y, 0);
+      lightRef.current.target.updateMatrixWorld();
+    }
+  });
+
   return (
     <>
       <ambientLight intensity={THEME.colors.ambientLight} />
       <directionalLight 
+        ref={lightRef}
+        castShadow
         position={THEME.colors.directLightPos} 
         intensity={THEME.colors.directLight} 
+        shadow-mapSize={[2048, 2048]}
+        shadow-camera-left={-100}
+        shadow-camera-right={100}
+        shadow-camera-top={100}
+        shadow-camera-bottom={-100}
+        shadow-camera-near={0.1}
+        shadow-camera-far={100}
+        shadow-bias={-0.001}
       />
       <CameraPointLight />
       <Environment preset="city" environmentIntensity={THEME.colors.environmentIntensity} />
 
       
       {/* Background Plane */}
-      <mesh position={[0, 0, -2]}>
+      <mesh position={[0, 0, -2]} receiveShadow>
         <planeGeometry args={[200, 200]} />
         <meshStandardMaterial color={THEME.colors.scenePlane} roughness={1} />
       </mesh>
@@ -93,6 +119,7 @@ function App() {
       style={{ width: '100vw', height: '100vh', position: 'relative', overflow: 'hidden' }}
     >
       <Canvas
+        shadows
         gl={{ toneMappingExposure: 1.2, antialias: false }}
         camera={{ position: [0, 0, THEME.camera.initialZ], fov: THEME.camera.fov }}
         style={{ width: '100%', height: '100%' }}

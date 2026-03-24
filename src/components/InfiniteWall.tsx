@@ -315,6 +315,8 @@ function EmptyBlock({ rect }: { rect: Rect }) {
       position={[cx, cy, -rect.depthOffset - 1.1]} // Adjusted center for 3.0 thickness (front stays at -rect.depthOffset + 0.4)
       scale={[rect.w, rect.h, 3.0]}
       geometry={BOX_GEO}
+      castShadow
+      receiveShadow
     >
       <PaperMaterial 
         ref={matRef} 
@@ -418,6 +420,8 @@ function WallBlock({ uid, rect, data, onClick, illustrationItem, onIllustrationC
       position={[cx, cy, 0]}
       scale={[rect.w, rect.h, 0.4]} 
       geometry={BOX_GEO}
+      castShadow
+      receiveShadow
       onPointerDown={(e) => {
         if (!isInteractive || isModalOpen) return;
         pointerDownPos.current = { x: e.clientX, y: e.clientY };
@@ -566,8 +570,8 @@ function AboutIcon() {
   const ref = useRef<THREE.Group>(null);
   useFrame(({ clock }) => { if (ref.current) { ref.current.rotation.y = clock.elapsedTime; ref.current.rotation.z = clock.elapsedTime * 0.5; } });
   return (
-    <group ref={ref} position={[0, 0, 0.6]}>
-      <mesh geometry={OCTA_GEO_SMALL}><meshStandardMaterial color={THEME.colors.accent} roughness={0.1} metalness={0.8} /></mesh>
+    <group ref={ref} position={[0, 0, 0.6]} castShadow receiveShadow>
+      <mesh geometry={OCTA_GEO_SMALL} castShadow receiveShadow><meshStandardMaterial color={THEME.colors.accent} roughness={0.1} metalness={0.8} /></mesh>
       <mesh geometry={OCTA_GEO_LARGE}><meshBasicMaterial wireframe color="white" transparent opacity={0.2} /></mesh>
     </group>
   );
@@ -632,7 +636,7 @@ function AboutIcon() {
     >
       <group scale={0.48}> {/* Smaller scale as requested */}
         {/* Wall Hook (Protrusion) - Deep cylinder to prevent gaps */}
-        <mesh position={[0, 0, -2.0]} rotation={[Math.PI / 2, 0, 0]}>
+        <mesh position={[0, 0, -2.0]} rotation={[Math.PI / 2, 0, 0]} castShadow receiveShadow>
           <cylinderGeometry args={[0.05, 0.05, 4.0, 16]} />
           <meshStandardMaterial color="#b3f0ff" metalness={0.8} roughness={0.2} />
         </mesh>
@@ -640,20 +644,20 @@ function AboutIcon() {
         {/* Main swinging group (pivoted at top) */}
         <group ref={groupRef} position={[0, -0.1, 0]}>
           {/* Top Ring */}
-          <mesh position={[0, 0, 0]} rotation={[Math.PI / 2, 0, 0]}>
+          <mesh position={[0, 0, 0]} rotation={[Math.PI / 2, 0, 0]} castShadow receiveShadow>
             <torusGeometry args={[0.08, 0.015, 16, 32]} />
             <meshStandardMaterial color="#ccc" metalness={0.9} roughness={0.1} />
           </mesh>
 
           {/* Icon Block */}
-          <mesh position={[0, -iconSize[1] / 2 - 0.1, 0]}>
+          <mesh position={[0, -iconSize[1] / 2 - 0.1, 0]} castShadow receiveShadow>
             <boxGeometry args={[iconSize[0], iconSize[1], 0.05]} />
             {acrylicMat(iconTex)}
           </mesh>
 
           {logoTex && (
             <group position={[0, -iconSize[1] - 0.1, 0]}>
-              <mesh rotation={[Math.PI / 2, 0, 0]}>
+              <mesh rotation={[Math.PI / 2, 0, 0]} castShadow receiveShadow>
                 <torusGeometry args={[0.06, 0.012, 16, 32]} />
                 <meshStandardMaterial color="#ccc" metalness={0.9} roughness={0.1} />
               </mesh>
@@ -661,7 +665,7 @@ function AboutIcon() {
               {/* Logo swinging group */}
               <group ref={logoGroupRef} position={[0, -0.1, 0]}>
                 {/* Logo Block */}
-                <mesh position={[0, -0.4, 0]}>
+                <mesh position={[0, -0.4, 0]} castShadow receiveShadow>
                   <boxGeometry args={[1.2, 0.45, 0.05]} />
                   {acrylicMat(logoTex)}
                 </mesh>

@@ -43,15 +43,15 @@ export const THEME = {
     opacityLerp: 0.05,
     cameraLerp: 5, // Used with delta time
     illustrationFloatSpeed: [0.5, 2.0], // [min, max]
-    illustrationFloatAmplitude: 0.15,
+    illustrationFloatAmplitude: 0.07,
   },
 
   // --- Colors & Aesthetics ---
   colors: {
      background: '#ffffff',
     scenePlane: '#ffffff',
-    ambientLight: 0.5,
-    directLight: 0.3,
+    ambientLight: 0.2,
+    directLight: 0.8,
     directLightPos: [2, 5, 5] as [number, number, number],
     environmentIntensity: 0.42,
     
@@ -60,7 +60,7 @@ export const THEME = {
     blockHover: '#b3f0ff',
     blockEmpty: '#f0f0ff',
     blockEmptyAccent: '#e1eaff', // うすい水色
-    blockAbout: '#99e0ffff',
+    blockAbout: '#99e0ff',
     
     // UI & Text
     textPrimary: '#ffffff',
@@ -84,14 +84,14 @@ export const THEME = {
     metal: {
       grainScale: 120.0,
       grainIntensity: 0.2,
-      roughness: 0.1,
-      metalness: 0.9,
+      roughness: 0.25,
+      metalness: 0.7,
     },
     // Background blocks (Empty) use milder metal settings in WallBlock
     metalEmpty: {
       grainScale: 80.0,
       grainIntensity: 0.5,
-      roughness: 0.5,
+      roughness: 0.8,
       metalness: 0.15,
     }
   },
