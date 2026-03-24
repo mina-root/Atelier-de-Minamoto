@@ -50,8 +50,13 @@ function Scene({
   onTextClick: (title: string, content: string) => void,
   isModalOpen: boolean 
 }) {
-  const { camera } = useThree();
+  const { camera, viewport } = useThree();
   const lightRef = useRef<THREE.DirectionalLight>(null);
+
+  // Calculate visible area in world units at depth=0 to optimize shadow map resolution
+  const vWidth = viewport.width;
+  const vHeight = viewport.height;
+  const shadowMargin = 2; // Extra units around the edge to avoid shadow clipping
 
   useFrame(() => {
     if (lightRef.current) {
@@ -63,6 +68,18 @@ function Scene({
       );
       lightRef.current.target.position.set(camera.position.x, camera.position.y, 0);
       lightRef.current.target.updateMatrixWorld();
+
+      // Dynamically sync shadow camera bounds to current viewport
+      const halfW = vWidth / 2 + shadowMargin;
+      const halfH = vHeight / 2 + shadowMargin;
+      const sCam = lightRef.current.shadow.camera;
+      if (sCam.left !== -halfW || sCam.right !== halfW || sCam.top !== halfH || sCam.bottom !== -halfH) {
+        sCam.left = -halfW;
+        sCam.right = halfW;
+        sCam.top = halfH;
+        sCam.bottom = -halfH;
+        sCam.updateProjectionMatrix();
+      }
     }
   });
 
@@ -75,13 +92,10 @@ function Scene({
         position={THEME.colors.directLightPos} 
         intensity={THEME.colors.directLight} 
         shadow-mapSize={[2048, 2048]}
-        shadow-camera-left={-100}
-        shadow-camera-right={100}
-        shadow-camera-top={100}
-        shadow-camera-bottom={-100}
         shadow-camera-near={0.1}
         shadow-camera-far={100}
-        shadow-bias={-0.001}
+        shadow-bias={-0.00005}
+        shadow-normalBias={0.05}
       />
       <CameraPointLight />
       <Environment preset="city" environmentIntensity={THEME.colors.environmentIntensity} />

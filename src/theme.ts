@@ -50,13 +50,13 @@ export const THEME = {
   colors: {
      background: '#ffffff',
     scenePlane: '#ffffff',
-    ambientLight: 0.2,
-    directLight: 0.8,
+    ambientLight: 0.4,
+    directLight: 0.6,
     directLightPos: [2, 5, 5] as [number, number, number],
     environmentIntensity: 0.42,
     
     // Block Materials
-    blockDefault: '#b8c5ff',
+    blockDefault: '#85beff',
     blockHover: '#b3f0ff',
     blockEmpty: '#f0f0ff',
     blockEmptyAccent: '#e1eaff', // うすい水色

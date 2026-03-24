@@ -604,6 +604,7 @@ function AboutIcon() {
       map={tex}
       transparent
       alphaTest={0.1}
+      side={THREE.DoubleSide}
       roughness={0.02}
       metalness={0.1} // Slightly more reflective
       transmission={0.95}
@@ -651,7 +652,7 @@ function AboutIcon() {
 
           {/* Icon Block */}
           <mesh position={[0, -iconSize[1] / 2 - 0.1, 0]} castShadow receiveShadow>
-            <boxGeometry args={[iconSize[0], iconSize[1], 0.05]} />
+            <planeGeometry args={[iconSize[0], iconSize[1]]} />
             {acrylicMat(iconTex)}
           </mesh>
 
@@ -666,7 +667,7 @@ function AboutIcon() {
               <group ref={logoGroupRef} position={[0, -0.1, 0]}>
                 {/* Logo Block */}
                 <mesh position={[0, -0.4, 0]} castShadow receiveShadow>
-                  <boxGeometry args={[1.2, 0.45, 0.05]} />
+                  <planeGeometry args={[1.2, 0.45]} />
                   {acrylicMat(logoTex)}
                 </mesh>
               </group>
