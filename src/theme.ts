@@ -18,20 +18,17 @@ export const THEME = {
 
   // --- Block Appearance ---
   block: {
-    baseThickness: 0.4,
-    borderRadius: '8px', // For HTML overlays
+    // Basic Geometry
+    totalThickness: 0.5,     // Total depth of the block geometry
+    surfaceOffset: 0.05,      // How much the front face protrudes from the wall base
+    randomDepthRange: 0.3,   // Random Z-variation range in the layout grid
     
-    // Z-axis movement & Scale
-    activeScale: 1.05,
-    activeThicknessFactor: 4,
-    activeZOffset: 1.5,
+    borderRadius: '8px',     // For HTML overlays
     
-    hoverThicknessFactor: 1.5,
-    hoverZOffset: 0.3,
-    
-    illustratingThicknessFactor: 2.5,
-    illustratingZOffsetRange: [0.2, 0.6], // [min, max] random offset
-    illustratingHoverZAdd: 0.3,
+    // Interaction Scales
+    contentHostScale: 1.15,  // Scale for blocks that contain images/info
+    hoverScaleAdd: 0.1,      // Additional scale when hovering a content block
+    interactiveHoverScale: 1.3, // Scale for interactive blocks when hovered
   },
 
   // --- Animation Factors (Lerp) ---
@@ -43,24 +40,24 @@ export const THEME = {
     opacityLerp: 0.05,
     cameraLerp: 5, // Used with delta time
     illustrationFloatSpeed: [0.5, 2.0], // [min, max]
-    illustrationFloatAmplitude: 0.07,
+    illustrationFloatAmplitude: 0.1,
   },
 
   // --- Colors & Aesthetics ---
   colors: {
      background: '#ffffff',
     scenePlane: '#ffffff',
-    ambientLight: 0.4,
-    directLight: 0.6,
+    ambientLight: 0.35,
+    directLight: 0.9,
     directLightPos: [2, 5, 5] as [number, number, number],
-    environmentIntensity: 0.42,
+    environmentIntensity: 0.5,
     
     // Block Materials
-    blockDefault: '#85beff',
+    blockDefault: '#9d85ff',
     blockHover: '#b3f0ff',
     blockEmpty: '#f0f0ff',
-    blockEmptyAccent: '#e1eaff', // うすい水色
-    blockAbout: '#99e0ff',
+    blockEmptyAccent: '#e1eaff',
+    blockAbout: '#99e0ff29',
     
     // UI & Text
     textPrimary: '#ffffff',
@@ -84,8 +81,8 @@ export const THEME = {
     metal: {
       grainScale: 120.0,
       grainIntensity: 0.2,
-      roughness: 0.25,
-      metalness: 0.7,
+      roughness: 0.15,
+      metalness: 0.9,
     },
     // Background blocks (Empty) use milder metal settings in WallBlock
     metalEmpty: {
@@ -98,8 +95,8 @@ export const THEME = {
 
   // --- Camera & Interaction ---
   camera: {
-    initialZ: 8,
-    fov: 42,
+    initialZ: 8.5,
+    fov: 40,
     wheelSensitivity: 0.01,
     dragSensitivity: 0.02,
   },

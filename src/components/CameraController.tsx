@@ -17,16 +17,14 @@ export function CameraController() {
     };
 
     const handlePointerDown = (e: PointerEvent) => {
-      // Don't drag if clicking on a UI element or interactive mesh
-      // We will handle that internally, but for canvas bg:
       isDragging.current = true;
+      document.body.classList.add('is-dragging');
       previousMousePosition.current = { x: e.clientX, y: e.clientY };
-      gl.domElement.style.cursor = 'grabbing';
     };
 
     const handlePointerUp = () => {
       isDragging.current = false;
-      gl.domElement.style.cursor = 'grab';
+      document.body.classList.remove('is-dragging');
     };
 
     const handlePointerMove = (e: PointerEvent) => {
@@ -45,14 +43,14 @@ export function CameraController() {
     domElement.addEventListener('wheel', handleWheel, { passive: true });
     domElement.addEventListener('pointerdown', handlePointerDown);
     window.addEventListener('pointerup', handlePointerUp);
+    window.addEventListener('pointercancel', handlePointerUp);
     window.addEventListener('pointermove', handlePointerMove);
-
-    domElement.style.cursor = 'grab';
 
     return () => {
       domElement.removeEventListener('wheel', handleWheel);
       domElement.removeEventListener('pointerdown', handlePointerDown);
       window.removeEventListener('pointerup', handlePointerUp);
+      window.removeEventListener('pointercancel', handlePointerUp);
       window.removeEventListener('pointermove', handlePointerMove);
     };
   }, [gl]);

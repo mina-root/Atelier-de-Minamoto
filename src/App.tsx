@@ -98,7 +98,7 @@ function Scene({
         shadow-normalBias={0.05}
       />
       <CameraPointLight />
-      <Environment preset="city" environmentIntensity={THEME.colors.environmentIntensity} />
+      <Environment preset="sunset" environmentIntensity={THEME.colors.environmentIntensity} />
 
       
       {/* Background Plane */}
@@ -130,7 +130,12 @@ function App() {
   return (
     <div 
       className={isModalOpen ? 'modal-is-open' : ''}
-      style={{ width: '100vw', height: '100vh', position: 'relative', overflow: 'hidden' }}
+      style={{ 
+        width: '100vw', 
+        height: '100vh', 
+        position: 'relative', 
+        overflow: 'hidden'
+      }}
     >
       <Canvas
         shadows
@@ -154,6 +159,7 @@ function App() {
       {/* Standard HTML Illustration Modal */}
       {selectedIllustration && (
         <div 
+          className="modal-backdrop"
           style={{
             position: 'fixed',
             top: 0, left: 0,
@@ -165,12 +171,11 @@ function App() {
             flexDirection: 'column',
             alignItems: 'center',
             justifyContent: 'center',
-            cursor: 'zoom-out',
             animation: 'fadeIn 0.3s ease-out'
           }}
           onClick={closeModal}
         >
-          <div style={{
+          <div className="modal-content" style={{
             position: 'relative',
             maxWidth: '90%',
             maxHeight: '80%',
@@ -259,6 +264,7 @@ function App() {
       {/* Text Content Modal */}
       {selectedText && (
         <div 
+          className="modal-backdrop"
           style={{
             position: 'fixed',
             top: 0, left: 0,
@@ -270,12 +276,12 @@ function App() {
             flexDirection: 'column',
             alignItems: 'center',
             justifyContent: 'center',
-            cursor: 'zoom-out',
             animation: 'fadeIn 0.3s ease-out'
           }}
           onClick={closeModal}
         >
           <div 
+            className="modal-content"
             style={{
               position: 'relative',
               maxWidth: '800px',
@@ -287,7 +293,6 @@ function App() {
               color: 'white',
               boxShadow: '0 30px 60px rgba(0,0,0,0.5)',
               border: '1px solid rgba(255,255,255,0.1)',
-              cursor: 'auto',
               overflowY: 'auto',
               display: 'flex',
               flexDirection: 'column'

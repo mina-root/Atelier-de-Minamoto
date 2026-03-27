@@ -134,11 +134,11 @@ function generateMondrianLayout(width: number, height: number, isMobile: boolean
         }
       }
 
-      const cRect = { x: cx, y: cy, w: def.w, h: def.h, dataIndex: def.dataIndex, depthOffset: Math.random() * 0.3, isContentEligible: false };
+      const cRect = { x: cx, y: cy, w: def.w, h: def.h, dataIndex: def.dataIndex, depthOffset: Math.random() * THEME.block.randomDepthRange, isContentEligible: false };
       const combined = [cRect];
       let dRect;
       if (def.dw > 0 && def.dh > 0) {
-        dRect = { x: dx, y: dy, w: def.dw, h: def.dh, dataIndex: def.descIndex, depthOffset: Math.random() * 0.3, isContentEligible: false };
+        dRect = { x: dx, y: dy, w: def.dw, h: def.dh, dataIndex: def.descIndex, depthOffset: Math.random() * THEME.block.randomDepthRange, isContentEligible: false };
         combined.push(dRect);
       }
 
@@ -224,13 +224,13 @@ function generateMondrianLayout(width: number, height: number, isMobile: boolean
   function splitEmpty(x: number, y: number, w: number, h: number) {
     if (w <= 0 || h <= 0) return;
     if (w <= MIN_BLOCK_SIZE * 1.5 && h <= MIN_BLOCK_SIZE * 1.5) {
-      rects.push({ x, y, w, h, dataIndex: emptyIndex++, depthOffset: Math.random() * 0.3, isContentEligible: true });
+      rects.push({ x, y, w, h, dataIndex: emptyIndex++, depthOffset: Math.random() * THEME.block.randomDepthRange, isContentEligible: true });
       return;
     }
     // Force subdivision if block is too large to avoid huge voids
     const tooLarge = w > 5 || h > 5;
     if (!isMobile && w * h > 6 && !tooLarge && Math.random() < 0.2) {
-      rects.push({ x, y, w, h, dataIndex: emptyIndex++, depthOffset: Math.random() * 0.3, isContentEligible: true });
+      rects.push({ x, y, w, h, dataIndex: emptyIndex++, depthOffset: Math.random() * THEME.block.randomDepthRange, isContentEligible: true });
       return;
     }
 
@@ -242,7 +242,7 @@ function generateMondrianLayout(width: number, height: number, isMobile: boolean
       const ratio = 0.2 + Math.random() * 0.6;
       const sh = h * ratio;
       if (sh < MIN_BLOCK_SIZE || h - sh < MIN_BLOCK_SIZE) {
-        rects.push({ x, y, w, h, dataIndex: emptyIndex++, depthOffset: Math.random() * 0.3, isContentEligible: true });
+        rects.push({ x, y, w, h, dataIndex: emptyIndex++, depthOffset: Math.random() * THEME.block.randomDepthRange, isContentEligible: true });
       } else {
         splitEmpty(x, y, w, sh);
         splitEmpty(x, y + sh, w, h - sh);
@@ -251,7 +251,7 @@ function generateMondrianLayout(width: number, height: number, isMobile: boolean
       const ratio = 0.2 + Math.random() * 0.6;
       const sw = w * ratio;
       if (sw < MIN_BLOCK_SIZE || w - sw < MIN_BLOCK_SIZE) {
-        rects.push({ x, y, w, h, dataIndex: emptyIndex++, depthOffset: Math.random() * 0.3, isContentEligible: true });
+        rects.push({ x, y, w, h, dataIndex: emptyIndex++, depthOffset: Math.random() * THEME.block.randomDepthRange, isContentEligible: true });
       } else {
         splitEmpty(x, y, sw, h);
         splitEmpty(x + sw, y, w - sw, h);
@@ -312,8 +312,8 @@ function EmptyBlock({ rect }: { rect: Rect }) {
   return (
     <mesh 
       ref={meshRef}
-      position={[cx, cy, -rect.depthOffset - 1.1]} // Adjusted center for 3.0 thickness (front stays at -rect.depthOffset + 0.4)
-      scale={[rect.w, rect.h, 3.0]}
+      position={[cx, cy, -rect.depthOffset - (THEME.block.totalThickness / 2 - THEME.block.surfaceOffset)]} 
+      scale={[rect.w, rect.h, THEME.block.totalThickness]}
       geometry={BOX_GEO}
       castShadow
       receiveShadow
@@ -362,10 +362,10 @@ function WallBlock({ uid, rect, data, onClick, illustrationItem, onIllustrationC
   let targetScaleZ = 1;
 
   if (isContentHost && !isProfileAbout) {
-    targetScaleZ = 1.15;
-    if (hovered && isInteractive && !isModalOpen) targetScaleZ += 0.1; // adding some feel
+    targetScaleZ = THEME.block.contentHostScale;
+    if (hovered && isInteractive && !isModalOpen) targetScaleZ += THEME.block.hoverScaleAdd;
   } else if (hovered && isInteractive && !isModalOpen) {
-    targetScaleZ = 1.3;
+    targetScaleZ = THEME.block.interactiveHoverScale;
   }
 
   const isThemedAbout = isProfileAbout || isLargeText; 
@@ -376,7 +376,7 @@ function WallBlock({ uid, rect, data, onClick, illustrationItem, onIllustrationC
     if (!meshRef.current) return;
     const fPos = 0.1, fSca = 0.15, fOpa = 0.2;
 
-    const finalTargetScaleZ = 3.0 * targetScaleZ;
+    const finalTargetScaleZ = THEME.block.totalThickness * targetScaleZ;
     meshRef.current.scale.z = THREE.MathUtils.lerp(meshRef.current.scale.z, finalTargetScaleZ, fSca);
 
     let zFloating = 0;
@@ -388,7 +388,7 @@ function WallBlock({ uid, rect, data, onClick, illustrationItem, onIllustrationC
 
     const thickness = meshRef.current.scale.z;
     // Position adjusted so front face remains consistent while block extends deep into background
-    const targetZ = -rect.depthOffset + zOff + zFloating + 0.4 - (thickness / 2);
+    const targetZ = -rect.depthOffset + zOff + zFloating + THEME.block.surfaceOffset - (thickness / 2);
     meshRef.current.position.z = THREE.MathUtils.lerp(meshRef.current.position.z, targetZ, fPos);
 
     opacityRef.current = THREE.MathUtils.lerp(opacityRef.current, targetOpacity, fOpa);
@@ -418,7 +418,7 @@ function WallBlock({ uid, rect, data, onClick, illustrationItem, onIllustrationC
     <mesh
       ref={meshRef}
       position={[cx, cy, 0]}
-      scale={[rect.w, rect.h, 0.4]} 
+      scale={[rect.w, rect.h, THEME.block.surfaceOffset]} 
       geometry={BOX_GEO}
       castShadow
       receiveShadow
@@ -451,12 +451,12 @@ function WallBlock({ uid, rect, data, onClick, illustrationItem, onIllustrationC
         if (isInteractive && !isModalOpen) { 
           e.stopPropagation(); 
           setHovered(true); 
-          document.body.style.cursor = 'pointer'; 
+          document.body.classList.add('is-hovering-block'); 
         } 
       }}
       onPointerOut={() => { 
         setHovered(false); 
-        document.body.style.cursor = 'auto'; 
+        document.body.classList.remove('is-hovering-block'); 
       }}
     >
       <MetalMaterial
@@ -516,7 +516,7 @@ function IndependentEmbed({ rect, data, illustrationItem }: { rect: Rect, data: 
     
     // We match the Z of WallBlock (CENTER + zHost + fZ) and add the surface offset.
     // Ensure visibility even when block is at max thickness (hovered = 1.3 * 0.4 = 0.52 thk total, face at 0.26).
-    const targetWZ = (-rect.depthOffset) + zHost + fZ + 0.451; 
+    const targetWZ = (-rect.depthOffset) + zHost + fZ + THEME.block.surfaceOffset + 0.051; 
 
     ref.current.position.x = targetWX;
     ref.current.position.y = targetWY;
@@ -541,7 +541,7 @@ function IndependentEmbed({ rect, data, illustrationItem }: { rect: Rect, data: 
       )}
       {data.type === 'about_name' && (
         <Html transform position={[0, 0, 0]} distanceFactor={1.5} pointerEvents="none" className="wall-html-content">
-          <div style={{ textAlign: 'center', color: '#111', width: '600px', userSelect: 'none' }}>
+          <div style={{ textAlign: 'center', color: 'white', width: '600px', userSelect: 'none' }}>
             <h1 style={{ fontSize: '64px', fontWeight: 900, letterSpacing: '0.2em' }}>ミナモト</h1>
           </div>
         </Html>
@@ -549,7 +549,7 @@ function IndependentEmbed({ rect, data, illustrationItem }: { rect: Rect, data: 
       {data.type === 'about_text' && (
         <Html transform position={[0, 0, 0]} scale={isProfileAbout ? 1 : 0.2} distanceFactor={isProfileAbout ? 1.2 : undefined} pointerEvents="none" className="wall-html-content">
           <div style={{ 
-            color: '#111', textAlign: (isProfileAbout || isLargeText) ? 'center' : 'left', fontWeight: isLargeText ? 700 : 400,
+            color: 'white', textAlign: (isProfileAbout || isLargeText) ? 'center' : 'left', fontWeight: isLargeText ? 700 : 400,
             fontSize: isProfileAbout ? '20px' : (isLargeText ? '32px' : '26px'), 
             fontFamily: isProfileAbout ? 'inherit' : "'DotGothic16', sans-serif",
             width: isProfileAbout ? '400px' : `${rect.w * 200}px`, height: isProfileAbout ? 'auto' : `${rect.h * 200}px`,
@@ -577,7 +577,7 @@ function AboutIcon() {
   );
 }
 
- function AcrylicKeyHolder({ position, iconUrl, logoUrl, linkUrl, iconSize = [0.8, 0.8], timeOffset = 0 }: { position: [number, number, number], iconUrl: string, logoUrl?: string, linkUrl: string, iconSize?: [number, number], timeOffset?: number }) {
+ function AcrylicKeyHolder({ position, iconUrl, logoUrl, linkUrl, iconSize = [0.8, 0.8], timeOffset = 0, isModalOpen }: { position: [number, number, number], iconUrl: string, logoUrl?: string, linkUrl: string, iconSize?: [number, number], timeOffset?: number, isModalOpen?: boolean }) {
   const groupRef = useRef<THREE.Group>(null);
   const logoGroupRef = useRef<THREE.Group>(null);
   const pointerDownPos = useRef<{ x: number, y: number } | null>(null);
@@ -619,8 +619,8 @@ function AboutIcon() {
   return (
     <group 
       position={position}
-      onPointerOver={(e) => { e.stopPropagation(); document.body.style.cursor = 'pointer'; }}
-      onPointerOut={() => { document.body.style.cursor = 'auto'; }}
+      onPointerOver={(e) => { e.stopPropagation(); if (!isModalOpen) document.body.classList.add('is-hovering-block'); }}
+      onPointerOut={() => { document.body.classList.remove('is-hovering-block'); }}
       onPointerDown={(e) => {
         pointerDownPos.current = { x: e.clientX, y: e.clientY };
       }}
@@ -761,6 +761,7 @@ export function InfiniteWall({
           iconUrl="/x_logo.png" 
           linkUrl="https://x.com/mina_Root" 
           timeOffset={0}
+          isModalOpen={isModalOpen}
         />
         <AcrylicKeyHolder 
           position={isMobile ? [0.0, -2.2, 0.9] : [1.0, -1.8, 1.0]} 
@@ -768,6 +769,7 @@ export function InfiniteWall({
           logoUrl="/pixiv_logo.png" 
           linkUrl="https://www.pixiv.net/users/87371443" 
           timeOffset={0.5}
+          isModalOpen={isModalOpen}
         />
         <AcrylicKeyHolder 
           position={isMobile ? [1.0, -2.2, 1.3] : [2.0, -1.8, 0.8]} 
@@ -775,6 +777,7 @@ export function InfiniteWall({
           linkUrl="https://skeb.jp/@mina_Root" 
           iconSize={[2.66, 0.8]}
           timeOffset={1.0}
+          isModalOpen={isModalOpen}
         />
       </group>
     );

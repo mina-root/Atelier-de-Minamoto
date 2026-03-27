@@ -10,14 +10,52 @@ html, body, #root {
   font-family: 'Inter', sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  cursor: grab;
 }
 
 * {
   box-sizing: border-box;
 }
 
+/* Cursor Management Hierarchy */
 
+body.is-hovering-block {
+  cursor: pointer;
+}
 
-.modal-is-open .wall-html-content {
+body.is-dragging,
+body.is-dragging * {
+  cursor: grabbing !important;
+}
+
+body.modal-open,
+.modal-is-open,
+.modal-is-open * {
+  cursor: default !important;
+}
+
+/* Allow pointer within modals for interactive elements */
+.modal-is-open button,
+.modal-is-open a,
+.modal-is-open [role="button"],
+.modal-is-open iframe {
+  cursor: auto !important; /* Let iframe handle it */
+}
+
+.modal-is-open button,
+.modal-is-open a {
+  cursor: pointer !important;
+}
+
+.modal-content {
+  cursor: default !important;
+}
+
+.modal-is-open .wall-html-content,
+.is-dragging .wall-html-content {
   pointer-events: none !important;
+}
+
+.is-dragging * {
+  user-select: none !important;
 }

@@ -32,14 +32,14 @@ export interface GridItemData {
 // ローカルの画像を使う場合は、"public/illustrations/" フォルダ内に画像を配置し、
 // srcの値を "/illustrations/ファイル名.png" などのように指定してください。
 export const illustrationsData: IllustrationItem[] = [
-  { id: "illus-1", src: "/illustrations/Outpost_Dissonance.jpg", title: "Outpost:Dissonance -advance- ジャケット", caption: "楽曲『Outpost:Dissonance』ジャケット", aspectRatio: 1.0 },
+  { id: "illus-1", src: "/illustrations/Outpost_Dissonance.jpg", title: "Outpost:Dissonance -advance-  ジャケット", caption: "楽曲『Outpost:Dissonance』ジャケット", aspectRatio: 1.0 },
   { id: "illus-2", src: "/illustrations/a_grain.png", title: "a grain", aspectRatio: 0.9949 },
-  { id: "illus-3", src: "/illustrations/dropsound.jpg", title: "dropsound", aspectRatio: 1.5175 },
+  { id: "illus-3", src: "/illustrations/dropsound.jpg", title: "Dropsound.", aspectRatio: 1.5175 },
   { id: "illus-4", src: "/illustrations/magsafeangel.jpg", title: "MagsafeAngel", aspectRatio: 0.4766 },
   { id: "illus-5", src: "/illustrations/向こう側.png", title: "向こう側", aspectRatio: 0.4614 },
   { id: "illus-6", src: "/illustrations/拡散する未来.png", title: "拡散する未来", aspectRatio: 1.6667 },
   { id: "illus-7", src: "/illustrations/浮遊.png", title: "浮遊", aspectRatio: 0.4619 },
-  { id: "illus-8", src: "/illustrations/狂信.PNG", title: "狂信", aspectRatio: 1.7778 },
+  { id: "illus-8", src: "/illustrations/狂信.PNG", title: "狂信(イラスト)", aspectRatio: 1.7778 },
   { id: "illus-9", src: "/illustrations/跳躍3.5.png", title: "跳躍3.5", aspectRatio: 0.5731 },
   { id: "illus-10", src: "/illustrations/風化させることなかれ.png", title: "風化させることなかれ", aspectRatio: 2.0 },
   { id: "illus-11", src: "/illustrations/風鈴.jpg", title: "風鈴", aspectRatio: 0.5933 }
@@ -52,7 +52,7 @@ export const discographyData: IllustrationItem[] = [
     trackId: "2284551407",
     src: "/illustrations/Outpost_Dissonance.jpg",
     title: "Outpost:Dissonance  -advance-",
-    caption: "SoundCloud: Outpost:Dissonance (Advance)",
+    caption: "",
     aspectRatio: 3.0
   },
   {
@@ -60,8 +60,8 @@ export const discographyData: IllustrationItem[] = [
     type: "youtube",
     videoId: "_l0dadAMPww",
     src: "https://img.youtube.com/vi/_l0dadAMPww/maxresdefault.jpg",
-    title: "おのれ",
-    caption: "ミナモト feat.重音テト・花隈千冬 / ボカデュオ2024参加曲",
+    title: "おのれ / 重音テト・花隈千冬",
+    caption: "ボカデュオ2024参加曲",
     aspectRatio: 1.7778
   },
   {
@@ -69,8 +69,8 @@ export const discographyData: IllustrationItem[] = [
     type: "youtube",
     videoId: "Gsn3BRKPxps",
     src: "/illustrations/狂信.PNG",
-    title: "狂信",
-    caption: "ミナモト feat.花隈千冬 / 「勝手に救われてね」",
+    title: "狂信 / 花隈千冬",
+    caption: "",
     aspectRatio: 1.7778
   }
 ];
