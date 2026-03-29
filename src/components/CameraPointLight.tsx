@@ -9,8 +9,12 @@ export function CameraPointLight() {
 
   useFrame(() => {
     if (lightRef.current) {
-      // Point light follows the camera position
-      lightRef.current.position.copy(camera.position);
+      // Point light follows the camera position with an offset
+      lightRef.current.position.set(
+        camera.position.x + THEME.colors.cameraPointLightOffset[0],
+        camera.position.y + THEME.colors.cameraPointLightOffset[1],
+        camera.position.z + THEME.colors.cameraPointLightOffset[2]
+      );
     }
   });
 

@@ -69,6 +69,7 @@ export const THEME = {
     overlayBorder: 'rgba(255,255,255,0.2)',
     cameraPointLight: '#ddf6ff',
     cameraPointLightIntensity: 0.14,
+    cameraPointLightOffset: [4, 4, 1.5] as [number, number, number],
   },
 
   // --- Material Parameters ---
@@ -106,8 +107,8 @@ export const THEME = {
     // Outer edges slightly misaligned intentionally
     icon:  { x: -2.3, y: -1.3, w: 2.4, h: 2.5, depth: 0.6 },
     name:  { x: 0.1,  y: 0.2,  w: 3.2, h: 1.1, depth: 0.5 },
-    text:  { x: 0.1,  y: -1.2, w: 2.8, h: 1.4, depth: 0.5 },
-    filler:{ x: 2.9,  y: -1.2, w: 0.4, h: 1.4, depth: 0.3 },
+    text:  { x: 0.1,  y: -1.6, w: 3.4, h: 1.8, depth: 0.5 },
+    filler:{ x: 5.1,  y: -1.6, w: 0.4, h: 1.8, depth: 0.3 },
   },
 
   // --- About Section Layout (Mobile) ---
@@ -115,7 +116,7 @@ export const THEME = {
     // Outer edges slightly misaligned
     icon:  { x: -1.6, y: 1.0,  w: 3.1, h: 3.0, depth: 0.6 },
     name:  { x: -1.8, y: -0.1,  w: 3.6, h: 1.1, depth: 0.5 },
-    text:  { x: -1.5, y: -1.5, w: 3.2, h: 1.4, depth: 0.5 },
+    text:  { x: -2.0, y: -1.8, w: 3.0, h: 1.8, depth: 0.5 },
     fillers: { depth: 0.4 },
   },
 

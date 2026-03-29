@@ -9,7 +9,7 @@ export interface IllustrationItem {
   trackId?: string;
 }
 
-export type ContentType = 'image' | 'youtube' | 'soundcloud' | 'project' | 'contact' | 'empty' | 'illustration_folder' | 'about_name' | 'about_icon' | 'about_text' | 'pagination';
+export type ContentType = 'image' | 'youtube' | 'soundcloud' | 'project' | 'contact' | 'empty' | 'illustration_folder' | 'about_name' | 'about_icon' | 'about_text' | 'pagination' | 'usage_report';
 
 export interface GridItemData {
   id: string;
@@ -95,7 +95,7 @@ export const aboutData: GridItemData[] = [
   { 
     id: "about-text", 
     type: "about_text", 
-    description: "デジタルアトリエへようこそ。\nここでは私の作品や実験的な\nプロジェクトを展示しています。", 
+    description: "イラスト・音楽を中心にいろいろ作っています。\nちゃがちゃが人工言語Artcoreなど。\n", 
     width: 1.2, 
     height: 1.2, 
     depthOffset: 0.5 
@@ -165,7 +165,10 @@ export const requestFullText = `✦ ご依頼について
 ご予算がある場合はあわせてご提示いただけますと、内容を調整しやすくなります。
 
 また、簡易的なご依頼については Skeb での受付も可能です。
-（Skebは比較的安価にご依頼いただけますが、リテイク不可・必ず受注できるわけではない点をご理解ください）
+Skebは比較的安価にご利用いただけますが、納品物について完成度に異議を申し立てることはできません。
+また、打ち合わせやリテイクを行うことはできませんし、受注を確約するものでもありません。
+Skebはコミッションを行うプラットフォームであるため、その点をご理解ください。
+詳しい内容についてはSkebのガイドライン(https://lp.skeb.jp/client)をご確認ください。
 
 ■ 着手・納期
 
@@ -197,12 +200,15 @@ export const termsFullText = `✦ 制作物の利用について
 
 ■ 同人・創作活動での利用
 
-無償または小規模な活動での利用は、使用報告のみで可能です。
-可能であればクレジット表記をお願いいたします。
+無償または小規模な活動での利用も、使用報告（事後可）のみで可能です。
+ただし、クレジット表記をお願いいたします。
 
 例：
-「歌ってみた」動画
-音ゲー譜面投稿 など
+「歌ってみた」動画へのイラスト・楽曲利用
+営利を目的としない範囲での音ゲーへの収録（ユーザー投稿コンテンツなど）
+
+※楽曲に付随するジャケットイラスト等については、原則として楽曲と一体の作品として扱ってください。
+イラスト単体での利用を希望される場合は、事前にご相談ください。
 
 ■ 商用利用
 
@@ -212,6 +218,7 @@ export const termsFullText = `✦ 制作物の利用について
 ■ 禁止事項
 
 公序良俗に反する利用
+政治的・宗教的な意図を含んだ利用
 二次配布・再配布を主目的とした利用
 
 ■ 著作権について
@@ -245,6 +252,18 @@ export const termsTextDataArray: GridItemData[] = [
     width: 2.4,
     height: 0.7,
     depthOffset: 0.1
+  }
+];
+
+export const reportTextDataArray: GridItemData[] = [
+  {
+    id: 'text-report-trigger',
+    type: 'usage_report',
+    title: '使用報告はこちら',
+    src: 'https://docs.google.com/forms/d/e/1FAIpQLSeVOAJVZB4h4BGue2ew3dOtXlSq668Pb6jgr4WrOFwbOeCutA/viewform?usp=publish-editor',
+    width: 1.2,
+    height: 0.4,
+    depthOffset: 0.15
   }
 ];
 

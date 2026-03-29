@@ -44,10 +44,12 @@ function ResponsiveCamera() {
 function Scene({ 
   onIllustrationClick, 
   onTextClick,
+  onReportClick,
   isModalOpen 
 }: { 
   onIllustrationClick: (item: IllustrationItem) => void, 
   onTextClick: (title: string, content: string) => void,
+  onReportClick: (url: string) => void,
   isModalOpen: boolean 
 }) {
   const { camera, viewport } = useThree();
@@ -110,6 +112,7 @@ function Scene({
       <InfiniteWall 
         onIllustrationClick={onIllustrationClick} 
         onTextClick={onTextClick}
+        onReportClick={onReportClick}
         isModalOpen={isModalOpen} 
       />
     </>
@@ -151,6 +154,7 @@ function App() {
           <Scene 
             onIllustrationClick={setSelectedIllustration} 
             onTextClick={(title, content) => setSelectedText({ title, content })}
+            onReportClick={(url) => window.open(url, '_blank')}
             isModalOpen={isModalOpen}
           />
         </Suspense>

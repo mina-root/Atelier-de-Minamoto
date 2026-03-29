@@ -2,7 +2,7 @@ import { useFrame } from '@react-three/fiber';
 import { useMemo, useRef, useState, Suspense, useEffect } from 'react';
 import * as THREE from 'three';
 import { Html, Image as DreiImage } from '@react-three/drei';
-import { aboutData, contentPoolData, requestTextDataArray, termsTextDataArray, type GridItemData, type IllustrationItem } from '../data';
+import { aboutData, contentPoolData, requestTextDataArray, termsTextDataArray, reportTextDataArray, type GridItemData, type IllustrationItem } from '../data';
 import { THEME } from '../theme';
 import { PaperMaterial } from './PaperMaterial';
 import { MetalMaterial } from './MetalMaterial';
@@ -77,6 +77,17 @@ function generateMondrianLayout(width: number, height: number, isMobile: boolean
       isContentEligible: false 
     });
 
+    const reportItem = reportTextDataArray[0];
+    prePlaced.push({ 
+      x: -8.5 + Math.random() * 0.5 + 0.5, 
+      y: -1.0 - reportItem.height - 0.2, 
+      w: reportItem.width, 
+      h: reportItem.height, 
+      dataIndex: 91, 
+      depthOffset: 0.25, 
+      isContentEligible: false 
+    });
+
   } else {
     // Mobile placement
     const reqItem = requestTextDataArray[0];
@@ -98,6 +109,17 @@ function generateMondrianLayout(width: number, height: number, isMobile: boolean
       h: termsItem.height, 
       dataIndex: 90, 
       depthOffset: 0.2, 
+      isContentEligible: false 
+    });
+
+    const reportItem = reportTextDataArray[0];
+    prePlaced.push({ 
+      x: -reportItem.width / 2, 
+      y: -6.5 - reportItem.height - 0.2, 
+      w: reportItem.width, 
+      h: reportItem.height, 
+      dataIndex: 91, 
+      depthOffset: 0.25, 
       isContentEligible: false 
     });
   }
@@ -303,7 +325,11 @@ function EmptyBlock({ rect }: { rect: Rect }) {
 
   useFrame(({ camera }) => {
     if (matRef.current?.uniforms) {
-      matRef.current.uniforms.uLightPos.value.copy(camera.position);
+      matRef.current.uniforms.uLightPos.value.set(
+        camera.position.x + THEME.colors.cameraPointLightOffset[0],
+        camera.position.y + THEME.colors.cameraPointLightOffset[1],
+        camera.position.z + THEME.colors.cameraPointLightOffset[2]
+      );
     }
   });
 
@@ -343,10 +369,11 @@ interface WallBlockProps {
   illustrationItem?: IllustrationItem;
   onIllustrationClick: (item: IllustrationItem) => void;
   onTextClick?: (title: string, content: string) => void;
+  onReportClick?: (url: string) => void;
   isModalOpen?: boolean;
 }
 
-function WallBlock({ uid, rect, data, onClick, illustrationItem, onIllustrationClick, onTextClick, isModalOpen }: WallBlockProps) {
+function WallBlock({ uid, rect, data, onClick, illustrationItem, onIllustrationClick, onTextClick, onReportClick, isModalOpen }: WallBlockProps) {
   const meshRef = useRef<THREE.Mesh>(null);
   const matRef = useRef<any>(null);
   const overlaysRef = useRef<THREE.Group>(null);
@@ -357,7 +384,7 @@ function WallBlock({ uid, rect, data, onClick, illustrationItem, onIllustrationC
   const isProfileAbout = data.id?.startsWith('about-');
   const isContentHost = illustrationItem || data.type !== 'empty';
   const isInteractive = data.type !== 'empty';
-  const isLargeText = data.id?.startsWith('text-request') || data.id?.startsWith('text-terms');
+  const isLargeText = data.id?.startsWith('text-request') || data.id?.startsWith('text-terms') || data.id?.startsWith('text-report');
 
   let targetScaleZ = 1;
 
@@ -394,7 +421,11 @@ function WallBlock({ uid, rect, data, onClick, illustrationItem, onIllustrationC
     opacityRef.current = THREE.MathUtils.lerp(opacityRef.current, targetOpacity, fOpa);
     if (matRef.current) {
       if (matRef.current.uniforms) {
-        matRef.current.uniforms.uLightPos.value.copy(camera.position);
+        matRef.current.uniforms.uLightPos.value.set(
+          camera.position.x + THEME.colors.cameraPointLightOffset[0],
+          camera.position.y + THEME.colors.cameraPointLightOffset[1],
+          camera.position.z + THEME.colors.cameraPointLightOffset[2]
+        );
       }
       matRef.current.opacity = opacityRef.current;
       matRef.current.transparent = true;
@@ -441,6 +472,8 @@ function WallBlock({ uid, rect, data, onClick, illustrationItem, onIllustrationC
 
         if (illustrationItem && (illustrationItem.type === 'image' || !illustrationItem.type)) {
           onIllustrationClick(illustrationItem);
+        } else if (data.type === 'usage_report' && onReportClick && data.src) {
+          onReportClick(data.src);
         } else if (isLargeText && onTextClick && data.title && data.description) {
           onTextClick(data.title, data.description);
         } else {
@@ -499,7 +532,7 @@ function WallBlock({ uid, rect, data, onClick, illustrationItem, onIllustrationC
 function IndependentEmbed({ rect, data, illustrationItem }: { rect: Rect, data: GridItemData, illustrationItem?: IllustrationItem }) {
   const ref = useRef<THREE.Group>(null);
   const isProfileAbout = data.id?.startsWith('about-');
-  const isLargeText = data.id?.startsWith('text-request') || data.id?.startsWith('text-terms');
+  const isLargeText = data.id?.startsWith('text-request') || data.id?.startsWith('text-terms') || data.id?.startsWith('text-report');
 
   useFrame(({ camera, clock }) => {
     if (!ref.current) return;
@@ -546,14 +579,14 @@ function IndependentEmbed({ rect, data, illustrationItem }: { rect: Rect, data: 
           </div>
         </Html>
       )}
-      {data.type === 'about_text' && (
+      {(data.type === 'about_text' || data.type === 'usage_report') && (
         <Html transform position={[0, 0, 0]} scale={isProfileAbout ? 1 : 0.2} distanceFactor={isProfileAbout ? 1.2 : undefined} pointerEvents="none" className="wall-html-content">
           <div style={{ 
             color: 'white', textAlign: (isProfileAbout || isLargeText) ? 'center' : 'left', fontWeight: isLargeText ? 700 : 400,
-            fontSize: isProfileAbout ? '20px' : (isLargeText ? '32px' : '26px'), 
+            fontSize: isProfileAbout ? '48px' : (data.type === 'usage_report' ? '22px' : (isLargeText ? '32px' : '26px')), 
             fontFamily: isProfileAbout ? 'inherit' : "'DotGothic16', sans-serif",
-            width: isProfileAbout ? '400px' : `${rect.w * 200}px`, height: isProfileAbout ? 'auto' : `${rect.h * 200}px`,
-            whiteSpace: 'pre-wrap', lineHeight: 1.6, overflowY: 'hidden', padding: isProfileAbout ? '0' : '20px', display: 'flex', alignItems: 'center', justifyContent: 'center', boxSizing: 'border-box'
+            width: isProfileAbout ? '1600px' : `${rect.w * 200}px`, height: isProfileAbout ? 'auto' : `${rect.h * 200}px`,
+            whiteSpace: 'pre-wrap', lineHeight: 1.4, overflowY: 'hidden', padding: isProfileAbout ? '0' : '20px', display: 'flex', alignItems: 'center', justifyContent: 'center', boxSizing: 'border-box'
           }}>
             {isLargeText ? data.title : data.description}
           </div>
@@ -683,10 +716,12 @@ function AboutIcon() {
 export function InfiniteWall({ 
   onIllustrationClick, 
   onTextClick,
+  onReportClick,
   isModalOpen 
 }: { 
   onIllustrationClick: (item: IllustrationItem) => void, 
   onTextClick: (title: string, content: string) => void,
+  onReportClick?: (url: string) => void,
   isModalOpen: boolean 
 }) {
   const [isMobile, setIsMobile] = useState(window.innerWidth < THEME.layout.mobileThreshold);
@@ -723,8 +758,12 @@ export function InfiniteWall({
 
           if (rect.dataIndex >= 80 && rect.dataIndex < 80 + requestTextDataArray.length) {
             dataItem = requestTextDataArray[rect.dataIndex - 80];
-          } else if (rect.dataIndex >= 90 && rect.dataIndex < 90 + termsTextDataArray.length) {
-            dataItem = termsTextDataArray[rect.dataIndex - 90];
+          } else if (rect.dataIndex >= 90 && rect.dataIndex < 90 + termsTextDataArray.length + reportTextDataArray.length) {
+            if (rect.dataIndex === 90) {
+              dataItem = termsTextDataArray[0];
+            } else if (rect.dataIndex === 91) {
+              dataItem = reportTextDataArray[0];
+            }
           } else if (rect.dataIndex < 10) {
             dataItem = aboutData[rect.dataIndex] || { type: 'empty' };
           } else if (rect.dataIndex >= 20 && rect.dataIndex < 20 + contentPoolData.length) {
@@ -751,20 +790,21 @@ export function InfiniteWall({
               illustrationItem={illustItem}
               onIllustrationClick={onIllustrationClick}
               onTextClick={onTextClick}
+              onReportClick={onReportClick}
               isModalOpen={isModalOpen}
             />
           );
         })}
         {/* Static decorative elements - displayed once per tile but they loop with the wall */}
         <AcrylicKeyHolder 
-          position={isMobile ? [-1.0, -2.2, 1.1] : [0.0, -1.8, 1.2]} 
+          position={isMobile ? [-1.3, -2.2, 0.5] : [-1.5, -1.8, 0.5]} 
           iconUrl="/x_logo.png" 
           linkUrl="https://x.com/mina_Root" 
           timeOffset={0}
           isModalOpen={isModalOpen}
         />
         <AcrylicKeyHolder 
-          position={isMobile ? [0.0, -2.2, 0.9] : [1.0, -1.8, 1.0]} 
+          position={isMobile ? [-0.6, -2.2, 0.55] : [-0.7, -1.8, 0.55]} 
           iconUrl="/pixiv_icon.png" 
           logoUrl="/pixiv_logo.png" 
           linkUrl="https://www.pixiv.net/users/87371443" 
@@ -772,11 +812,19 @@ export function InfiniteWall({
           isModalOpen={isModalOpen}
         />
         <AcrylicKeyHolder 
-          position={isMobile ? [1.0, -2.2, 1.3] : [2.0, -1.8, 0.8]} 
+          position={isMobile ? [0.3, -2.2, 0.45] : [0.3, -1.8, 0.45]} 
           iconUrl="/skeb.svg" 
           linkUrl="https://skeb.jp/@mina_Root" 
-          iconSize={[2.66, 0.8]}
+          iconSize={[2, 0.6]}
           timeOffset={1.0}
+          isModalOpen={isModalOpen}
+        />
+        <AcrylicKeyHolder 
+          position={isMobile ? [1.2, -2.2, 0.58] : [1.3, -1.8, 0.58]} 
+          iconUrl="/soundcloud.png" 
+          linkUrl="https://soundcloud.com/mina_root" 
+          iconSize={[1.6, 0.8]}
+          timeOffset={1.5}
           isModalOpen={isModalOpen}
         />
       </group>
@@ -794,8 +842,9 @@ export function InfiniteWall({
 
         if (rect.dataIndex >= 80 && rect.dataIndex < 80 + requestTextDataArray.length) {
           dataItem = requestTextDataArray[rect.dataIndex - 80];
-        } else if (rect.dataIndex >= 90 && rect.dataIndex < 90 + termsTextDataArray.length) {
-          dataItem = termsTextDataArray[rect.dataIndex - 90];
+        } else if (rect.dataIndex >= 90 && rect.dataIndex < 90 + termsTextDataArray.length + reportTextDataArray.length) {
+          if (rect.dataIndex === 90) dataItem = termsTextDataArray[0];
+          else if (rect.dataIndex === 91) dataItem = reportTextDataArray[0];
         } else if (rect.dataIndex < 10) {
           dataItem = aboutData[rect.dataIndex] || null;
         } else if (rect.dataIndex >= 20 && rect.dataIndex < 20 + contentPoolData.length) {
@@ -806,7 +855,7 @@ export function InfiniteWall({
         }
 
         if (!dataItem) return null;
-        const needsHtml = illustItem?.type === 'youtube' || illustItem?.type === 'soundcloud' || dataItem.type === 'about_name' || dataItem.type === 'about_text';
+        const needsHtml = illustItem?.type === 'youtube' || illustItem?.type === 'soundcloud' || dataItem.type === 'about_name' || dataItem.type === 'about_text' || dataItem.type === 'usage_report';
         if (!needsHtml) return null;
 
         return <IndependentEmbed key={`global-${rect.dataIndex}`} rect={rect} data={dataItem} illustrationItem={illustItem} />;
