@@ -250,8 +250,8 @@ function generateMondrianLayout(width: number, height: number, isMobile: boolean
       return;
     }
     // Force subdivision if block is too large to avoid huge voids
-    const tooLarge = w > 5 || h > 5;
-    if (!isMobile && w * h > 6 && !tooLarge && Math.random() < 0.2) {
+    const tooLarge = w > 4 || h > 4;
+    if (!isMobile && w * h > 4 && !tooLarge && Math.random() < 0.1) {
       rects.push({ x, y, w, h, dataIndex: emptyIndex++, depthOffset: Math.random() * THEME.block.randomDepthRange, isContentEligible: true });
       return;
     }
@@ -801,7 +801,7 @@ export function InfiniteWall({
           const uid = `tile-${idx}-rect-${rect.dataIndex}`;
 
           // Use lightweight EmptyBlock for filler rects (no useFrame overhead)
-          if (rect.dataIndex >= 100) {
+          if (rect.dataIndex >= 100 || (rect.dataIndex < 10 && dataItem.type === 'empty')) {
             return <EmptyBlock key={uid} rect={rect} />;
           }
 

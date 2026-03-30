@@ -57,7 +57,7 @@ export const THEME = {
     blockHover: '#b3f0ff',
     blockEmpty: '#f0f0ff',
     blockEmptyAccent: '#e1eaff',
-    blockAbout: '#99e0ff29',
+    blockAbout: '#99e0ffcc',
     
     // UI & Text
     textPrimary: '#ffffff',

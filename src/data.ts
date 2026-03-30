@@ -274,7 +274,7 @@ export const boothDataArray: GridItemData[] = [
   {
     id: 'booth-ring',
     type: 'booth_item',
-    title: '【VRC向け】\npair ring \n-chocolate & macaron-',
+    title: '【VRC向け】\npair ring -chocolate & macaron-',
     src: 'https://mina-root.booth.pm/items/6719210',
     width: 2.0,
     height: 1.6,
