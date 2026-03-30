@@ -21,22 +21,32 @@ export const MetalMaterial = forwardRef((props: any, ref) => {
   const onBeforeCompile = (shader: any) => {
     shader.uniforms.uGrainScale = uniforms.uGrainScale;
     shader.uniforms.uGrainIntensity = uniforms.uGrainIntensity;
+    shader.uniforms.uHeightMap = { value: props.uHeightMap || null };
+    shader.uniforms.uEngraveIntensity = { value: props.uEngraveIntensity || 0.0 };
 
     shader.vertexShader = `
       varying vec3 vWorldPosition;
+      varying vec2 vEngraveUv;
+      varying vec3 vObjectNormal;
       ${shader.vertexShader}
     `.replace(
       '#include <worldpos_vertex>',
       `
       #include <worldpos_vertex>
       vWorldPosition = worldPosition.xyz;
+      vEngraveUv = uv;
+      vObjectNormal = normal;
       `
     );
 
     shader.fragmentShader = `
       uniform float uGrainScale;
       uniform float uGrainIntensity;
+      uniform sampler2D uHeightMap;
+      uniform float uEngraveIntensity;
       varying vec3 vWorldPosition;
+      varying vec2 vEngraveUv;
+      varying vec3 vObjectNormal;
 
       float hash(vec2 p) {
         return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453123);
@@ -68,6 +78,12 @@ export const MetalMaterial = forwardRef((props: any, ref) => {
       vec2 metalUv = vWorldPosition.xy * uGrainScale;
       float n = fbm(metalUv);
       diffuseColor.rgb *= (0.95 + n * 0.1);
+
+      if (uEngraveIntensity > 0.0 && vObjectNormal.z > 0.5) {
+        float h = texture2D(uHeightMap, vEngraveUv).r;
+        // Darken the recessed areas
+        diffuseColor.rgb *= mix(1.0, 0.7 + h * 0.3, uEngraveIntensity);
+      }
       `
     ).replace(
       '#include <normal_fragment_begin>',
@@ -77,7 +93,17 @@ export const MetalMaterial = forwardRef((props: any, ref) => {
       float eps = 0.01;
       float nx = noise(metalUvNorm + vec2(eps, 0.0)) - noise(metalUvNorm - vec2(eps, 0.0));
       float ny = noise(metalUvNorm + vec2(0.0, eps)) - noise(metalUvNorm - vec2(0.0, eps));
-      normal = normalize(normal + vec3(nx, ny, 0.0) * uGrainIntensity);
+      
+      vec3 grainNormal = vec3(nx, ny, 0.0) * uGrainIntensity;
+
+      if (uEngraveIntensity > 0.0 && vObjectNormal.z > 0.5) {
+        float hEps = 0.005;
+        float hx = texture2D(uHeightMap, vEngraveUv + vec2(hEps, 0.0)).r - texture2D(uHeightMap, vEngraveUv - vec2(hEps, 0.0)).r;
+        float hy = texture2D(uHeightMap, vEngraveUv + vec2(0.0, hEps)).r - texture2D(uHeightMap, vEngraveUv - vec2(0.0, hEps)).r;
+        grainNormal += vec3(hx, hy, 0.0) * uEngraveIntensity * 10.0;
+      }
+
+      normal = normalize(normal + grainNormal);
       `
     );
   };

@@ -32,7 +32,7 @@ export interface GridItemData {
 // ローカルの画像を使う場合は、"public/illustrations/" フォルダ内に画像を配置し、
 // srcの値を "/illustrations/ファイル名.png" などのように指定してください。
 export const illustrationsData: IllustrationItem[] = [
-  { id: "illus-1", src: "/illustrations/Outpost_Dissonance.jpg", title: "Outpost:Dissonance -advance-  ジャケット", caption: "楽曲『Outpost:Dissonance』ジャケット", aspectRatio: 1.0 },
+  { id: "illus-1", src: "/illustrations/Outpost_Dissonance.jpg", title: "Outpost:Dissonance\n    -advance- \n   ジャケット", caption: "楽曲『Outpost:Dissonance』ジャケット", aspectRatio: 1.0 },
   { id: "illus-2", src: "/illustrations/a_grain.png", title: "a grain", aspectRatio: 0.9949 },
   { id: "illus-3", src: "/illustrations/dropsound.jpg", title: "Dropsound.", aspectRatio: 1.5175 },
   { id: "illus-4", src: "/illustrations/magsafeangel.jpg", title: "MagsafeAngel", aspectRatio: 0.4766 },
@@ -59,7 +59,7 @@ export const discographyData: IllustrationItem[] = [
     type: "youtube",
     videoId: "_l0dadAMPww",
     src: "https://img.youtube.com/vi/_l0dadAMPww/maxresdefault.jpg",
-    title: "おのれ / 重音テト・花隈千冬",
+    title: "おのれ \n / 重音テト・花隈千冬",
     caption: "ボカデュオ2024参加曲",
     aspectRatio: 1.7778
   },
@@ -274,7 +274,7 @@ export const boothDataArray: GridItemData[] = [
   {
     id: 'booth-ring',
     type: 'booth_item',
-    title: '【VRChat向けアクセサリ】pair ring -chocolate & macaron-',
+    title: '【VRC向け】\npair ring \n-chocolate & macaron-',
     src: 'https://mina-root.booth.pm/items/6719210',
     width: 2.0,
     height: 1.6,

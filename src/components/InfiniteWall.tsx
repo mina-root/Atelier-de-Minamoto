@@ -317,6 +317,43 @@ function getBlockFloat(idx: number, clock: number) {
   };
 }
 
+// --- Hook: Engrave Texture Generator ---
+function useEngraveTexture(text: string, font: string) {
+  return useMemo(() => {
+    const canvas = document.createElement('canvas');
+    canvas.width = 1024;
+    canvas.height = 1024;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return null;
+
+    // Background: High (Surface)
+    ctx.fillStyle = 'white';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    // Text: Low (Recessed)
+    ctx.fillStyle = 'black';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    
+    // We assume a ~3:1 aspect ratio for the name block. 
+    // To compensate for the stretching on the 3D mesh, we compress it on the canvas.
+    ctx.save();
+    ctx.translate(canvas.width / 2, canvas.height / 2);
+    ctx.scale(0.35, 1.0); // Compensate for ~2.9x width stretch 
+    ctx.font = `900 350px ${font}`;
+    ctx.fillText(text, 0, 0);
+    ctx.restore();
+
+    // Add a slight blur to make the engrave edges smoother
+    ctx.filter = 'blur(4px)';
+    ctx.drawImage(canvas, 0, 0);
+
+    const tex = new THREE.CanvasTexture(canvas);
+    tex.anisotropy = 16;
+    return tex;
+  }, [text, font]);
+}
+
 function EmptyBlock({ rect }: { rect: Rect }) {
   const meshRef = useRef<THREE.Mesh>(null);
   const matRef = useRef<any>(null);
@@ -371,9 +408,10 @@ interface WallBlockProps {
   onTextClick?: (title: string, content: string) => void;
   onReportClick?: (url: string) => void;
   isModalOpen?: boolean;
+  engraveTexture?: THREE.Texture | null;
 }
 
-function WallBlock({ uid, rect, data, onClick, illustrationItem, onIllustrationClick, onTextClick, onReportClick, isModalOpen }: WallBlockProps) {
+function WallBlock({ uid, rect, data, onClick, illustrationItem, onIllustrationClick, onTextClick, onReportClick, isModalOpen, engraveTexture }: WallBlockProps) {
   const meshRef = useRef<THREE.Mesh>(null);
   const matRef = useRef<any>(null);
   const overlaysRef = useRef<THREE.Group>(null);
@@ -504,6 +542,8 @@ function WallBlock({ uid, rect, data, onClick, illustrationItem, onIllustrationC
         uDirectLightIntensity={THEME.colors.directLight}
         uDirectLightPos={LIGHT_POS_V}
         uEnvironmentIntensity={THEME.colors.environmentIntensity}
+        uHeightMap={data.type === 'about_name' ? engraveTexture : null}
+        uEngraveIntensity={data.type === 'about_name' ? 1.0 : 0.0}
         transparent
       />
       <group ref={overlaysRef} scale={[1/rect.w, 1/rect.h, 1]}>
@@ -570,13 +610,8 @@ function IndependentEmbed({ rect, data, illustrationItem, isMobile }: { rect: Re
           </div>
         </Html>
       )}
-      {data.type === 'about_name' && (
-        <Html transform position={[0, 0, 0]} distanceFactor={1.5} pointerEvents="none" className="wall-html-content">
-          <div style={{ textAlign: 'center', color: 'white', width: '600px', userSelect: 'none' }}>
-            <h1 style={{ fontSize: isMobile ? '72px' : '96px', fontWeight: 900, letterSpacing: '0.2em', fontFamily: "'WDXL Lubrifont JP N', sans-serif" }}>ミナモト</h1>
-          </div>
-        </Html>
-      )}
+      {/* data.type === 'about_name' is now handled by EngraveMaterial in WallBlock */}
+
       {(data.type === 'about_text' || data.type === 'usage_report' || data.type === 'booth_item') && (
         <Html transform position={[0, 0, 0]} scale={isProfileAbout ? 1 : 0.2} distanceFactor={isProfileAbout ? 1.2 : undefined} pointerEvents="none" className="wall-html-content">
           <div style={{ 
@@ -717,6 +752,7 @@ export function InfiniteWall({
     return () => window.removeEventListener('resize', h);
   }, []);
 
+  const engraveTexture = useEngraveTexture("ミナモト", "'WDXL Lubrifont JP N'");
   const layout = useMemo(() => generateMondrianLayout(TILE_W, TILE_H, isMobile), [isMobile]);
   const tilesRef = useRef<THREE.Group[]>([]);
 
@@ -778,6 +814,7 @@ export function InfiniteWall({
               onTextClick={onTextClick}
               onReportClick={onReportClick}
               isModalOpen={isModalOpen}
+              engraveTexture={engraveTexture}
             />
           );
         })}
