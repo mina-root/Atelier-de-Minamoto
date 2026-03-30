@@ -39,7 +39,6 @@ export const illustrationsData: IllustrationItem[] = [
   { id: "illus-5", src: "/illustrations/向こう側.png", title: "向こう側", aspectRatio: 0.4614 },
   { id: "illus-6", src: "/illustrations/拡散する未来.png", title: "拡散する未来", aspectRatio: 1.6667 },
   { id: "illus-7", src: "/illustrations/浮遊.png", title: "浮遊", aspectRatio: 0.4619 },
-  { id: "illus-8", src: "/illustrations/狂信.PNG", title: "狂信(イラスト)", aspectRatio: 1.7778 },
   { id: "illus-9", src: "/illustrations/跳躍3.5.png", title: "跳躍3.5", aspectRatio: 0.5731 },
   { id: "illus-10", src: "/illustrations/風化させることなかれ.png", title: "風化させることなかれ", aspectRatio: 2.0 },
   { id: "illus-11", src: "/illustrations/風鈴.jpg", title: "風鈴", aspectRatio: 0.5933 }
@@ -90,7 +89,11 @@ export const aboutData: GridItemData[] = [
     type: "about_icon", 
     width: 1.2, 
     height: 1.2, 
-    depthOffset: 0.6 
+    depthOffset: 0.6,
+    src: "/illustrations/狂信.PNG",
+    illustrationItems: [
+      { id: "about-icon-img", src: "/illustrations/狂信.PNG", aspectRatio: 1.7778, title: "狂信" }
+    ]
   },
   { 
     id: "about-text", 

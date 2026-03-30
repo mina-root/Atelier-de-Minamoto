@@ -383,7 +383,7 @@ function WallBlock({ uid, rect, data, onClick, illustrationItem, onIllustrationC
 
   const isProfileAbout = data.id?.startsWith('about-');
   const isContentHost = illustrationItem || data.type !== 'empty';
-  const isInteractive = data.type !== 'empty';
+  const isInteractive = data.type !== 'empty' && data.type !== 'about_icon';
   const isLargeText = data.id?.startsWith('text-request') || data.id?.startsWith('text-terms') || data.id?.startsWith('text-report') || data.type === 'booth_item';
 
   let targetScaleZ = 1;
@@ -517,11 +517,9 @@ function WallBlock({ uid, rect, data, onClick, illustrationItem, onIllustrationC
               transparent 
               opacity={0} 
               toneMapped={false}
+              zoom={data.type === 'about_icon' ? 1.333 : 1}
             />
           </Suspense>
-        )}
-        {data.type === 'about_icon' && (
-          <AboutIcon />
         )}
       </group>
     </mesh>
@@ -529,7 +527,7 @@ function WallBlock({ uid, rect, data, onClick, illustrationItem, onIllustrationC
 }
 
 // --- Component: IndependentEmbed (Global Iframe Layer) ---
-function IndependentEmbed({ rect, data, illustrationItem }: { rect: Rect, data: GridItemData, illustrationItem?: IllustrationItem }) {
+function IndependentEmbed({ rect, data, illustrationItem, isMobile }: { rect: Rect, data: GridItemData, illustrationItem?: IllustrationItem, isMobile: boolean }) {
   const ref = useRef<THREE.Group>(null);
   const isProfileAbout = data.id?.startsWith('about-');
   const isLargeText = data.id?.startsWith('text-request') || data.id?.startsWith('text-terms') || data.id?.startsWith('text-report') || data.type === 'booth_item';
@@ -575,7 +573,7 @@ function IndependentEmbed({ rect, data, illustrationItem }: { rect: Rect, data: 
       {data.type === 'about_name' && (
         <Html transform position={[0, 0, 0]} distanceFactor={1.5} pointerEvents="none" className="wall-html-content">
           <div style={{ textAlign: 'center', color: 'white', width: '600px', userSelect: 'none' }}>
-            <h1 style={{ fontSize: '64px', fontWeight: 900, letterSpacing: '0.2em', fontFamily: "'WDXL Lubrifont JP N', sans-serif" }}>ミナモト</h1>
+            <h1 style={{ fontSize: isMobile ? '72px' : '96px', fontWeight: 900, letterSpacing: '0.2em', fontFamily: "'WDXL Lubrifont JP N', sans-serif" }}>ミナモト</h1>
           </div>
         </Html>
       )}
@@ -583,7 +581,7 @@ function IndependentEmbed({ rect, data, illustrationItem }: { rect: Rect, data: 
         <Html transform position={[0, 0, 0]} scale={isProfileAbout ? 1 : 0.2} distanceFactor={isProfileAbout ? 1.2 : undefined} pointerEvents="none" className="wall-html-content">
           <div style={{ 
             color: 'white', textAlign: (isProfileAbout || isLargeText) ? 'center' : 'left', fontWeight: isLargeText ? 700 : 400,
-            fontSize: isProfileAbout ? '48px' : (data.type === 'usage_report' || data.type === 'booth_item' ? '22px' : (isLargeText ? '32px' : '26px')), 
+            fontSize: isProfileAbout ? (isMobile ? '40px' : '48px') : (data.type === 'usage_report' || data.type === 'booth_item' ? '22px' : (isLargeText ? '32px' : '26px')), 
             fontFamily: isProfileAbout ? 'inherit' : "'DotGothic16', sans-serif",
             width: isProfileAbout ? '1600px' : (`${rect.w * 200}px`), height: isProfileAbout ? 'auto' : `${rect.h * 200}px`,
             whiteSpace: 'pre-wrap', lineHeight: 1.4, overflowY: 'hidden', padding: isProfileAbout ? '0' : '20px', display: 'flex', alignItems: 'center', justifyContent: 'center', boxSizing: 'border-box'
@@ -596,20 +594,7 @@ function IndependentEmbed({ rect, data, illustrationItem }: { rect: Rect, data: 
   );
 }
 
-const OCTA_GEO_SMALL = new THREE.OctahedronGeometry(0.5);
-const OCTA_GEO_LARGE = new THREE.OctahedronGeometry(0.55);
-
-function AboutIcon() {
-  const ref = useRef<THREE.Group>(null);
-  useFrame(({ clock }) => { if (ref.current) { ref.current.rotation.y = clock.elapsedTime; ref.current.rotation.z = clock.elapsedTime * 0.5; } });
-  return (
-    <group ref={ref} position={[0, 0, 0.6]} castShadow receiveShadow>
-      <mesh geometry={OCTA_GEO_SMALL} castShadow receiveShadow><meshStandardMaterial color={THEME.colors.accent} roughness={0.1} metalness={0.8} /></mesh>
-      <mesh geometry={OCTA_GEO_LARGE}><meshBasicMaterial wireframe color="white" transparent opacity={0.2} /></mesh>
-    </group>
-  );
-}
-
+40
  function AcrylicKeyHolder({ position, iconUrl, logoUrl, linkUrl, iconSize = [0.8, 0.8], timeOffset = 0, isModalOpen }: { position: [number, number, number], iconUrl: string, logoUrl?: string, linkUrl: string, iconSize?: [number, number], timeOffset?: number, isModalOpen?: boolean }) {
   const groupRef = useRef<THREE.Group>(null);
   const logoGroupRef = useRef<THREE.Group>(null);
@@ -766,6 +751,7 @@ export function InfiniteWall({
             }
           } else if (rect.dataIndex < 10) {
             dataItem = aboutData[rect.dataIndex] || { type: 'empty' };
+            illustItem = dataItem?.illustrationItems?.[0]; 
           } else if (rect.dataIndex >= 20 && rect.dataIndex < 20 + contentPoolData.length) {
             dataItem = contentPoolData[rect.dataIndex - 20].content;
             illustItem = dataItem?.illustrationItems?.[0]; 
@@ -866,7 +852,7 @@ export function InfiniteWall({
         const needsHtml = illustItem?.type === 'youtube' || illustItem?.type === 'soundcloud' || dataItem.type === 'about_name' || dataItem.type === 'about_text' || dataItem.type === 'usage_report';
         if (!needsHtml) return null;
 
-        return <IndependentEmbed key={`global-${rect.dataIndex}`} rect={rect} data={dataItem} illustrationItem={illustItem} />;
+        return <IndependentEmbed key={`global-${rect.dataIndex}`} rect={rect} data={dataItem} illustrationItem={illustItem} isMobile={isMobile} />;
       })}
     </group>
   );
