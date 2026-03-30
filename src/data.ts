@@ -9,7 +9,7 @@ export interface IllustrationItem {
   trackId?: string;
 }
 
-export type ContentType = 'image' | 'youtube' | 'soundcloud' | 'project' | 'contact' | 'empty' | 'illustration_folder' | 'about_name' | 'about_icon' | 'about_text' | 'pagination' | 'usage_report';
+export type ContentType = 'image' | 'youtube' | 'soundcloud' | 'project' | 'contact' | 'empty' | 'illustration_folder' | 'about_name' | 'about_icon' | 'about_text' | 'pagination' | 'usage_report' | 'booth_item';
 
 export interface GridItemData {
   id: string;
@@ -266,6 +266,46 @@ export const reportTextDataArray: GridItemData[] = [
     depthOffset: 0.15
   }
 ];
+
+export const boothDataArray: GridItemData[] = [
+  {
+    id: 'booth-ring',
+    type: 'booth_item',
+    title: '【VRChat向けアクセサリ】pair ring -chocolate & macaron-',
+    src: 'https://mina-root.booth.pm/items/6719210',
+    width: 2.0,
+    height: 1.6,
+    depthOffset: 0.2,
+    illustrationItems: [
+      {
+        id: 'booth-ring-img',
+        src: '/Booth/choco_macaron.png',
+        aspectRatio: 1.0, 
+      }
+    ]
+  }
+];
+
+// Add the Booth item to the general content pool so it has a caption and is placed like others
+boothDataArray.forEach((item, i) => {
+  contentPoolData.push({
+    content: {
+      ...item,
+      id: `booth-c-${i}`,
+      width: 1.8,  // Square size
+      height: 1.8,
+      depthOffset: Math.random() * 0.3,
+    },
+    desc: {
+      id: `booth-d-${i}`,
+      type: 'about_text',
+      description: item.title,
+      width: 1.2,
+      height: 1.0,
+      depthOffset: Math.random() * 0.3
+    }
+  });
+});
 
 
 // Fallback logic

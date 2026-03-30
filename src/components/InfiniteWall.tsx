@@ -2,7 +2,7 @@ import { useFrame } from '@react-three/fiber';
 import { useMemo, useRef, useState, Suspense, useEffect } from 'react';
 import * as THREE from 'three';
 import { Html, Image as DreiImage } from '@react-three/drei';
-import { aboutData, contentPoolData, requestTextDataArray, termsTextDataArray, reportTextDataArray, type GridItemData, type IllustrationItem } from '../data';
+import { aboutData, contentPoolData, requestTextDataArray, termsTextDataArray, reportTextDataArray, boothDataArray, type GridItemData, type IllustrationItem } from '../data';
 import { THEME } from '../theme';
 import { PaperMaterial } from './PaperMaterial';
 import { MetalMaterial } from './MetalMaterial';
@@ -68,7 +68,7 @@ function generateMondrianLayout(width: number, height: number, isMobile: boolean
 
     const termsItem = termsTextDataArray[0];
     prePlaced.push({ 
-      x: -8.5 + Math.random() * 0.5, 
+      x: -6.0 + Math.random() * 0.5, 
       y: -1.0, 
       w: termsItem.width, 
       h: termsItem.height, 
@@ -79,7 +79,7 @@ function generateMondrianLayout(width: number, height: number, isMobile: boolean
 
     const reportItem = reportTextDataArray[0];
     prePlaced.push({ 
-      x: -8.5 + Math.random() * 0.5 + 0.5, 
+      x: -6.0 + Math.random() * 0.5 + 0.5, 
       y: -1.0 - reportItem.height - 0.2, 
       w: reportItem.width, 
       h: reportItem.height, 
@@ -93,7 +93,7 @@ function generateMondrianLayout(width: number, height: number, isMobile: boolean
     const reqItem = requestTextDataArray[0];
     prePlaced.push({ 
       x: -reqItem.width / 2, 
-      y: -4.0, 
+      y: -5.0, 
       w: reqItem.width, 
       h: reqItem.height, 
       dataIndex: 80, 
@@ -384,7 +384,7 @@ function WallBlock({ uid, rect, data, onClick, illustrationItem, onIllustrationC
   const isProfileAbout = data.id?.startsWith('about-');
   const isContentHost = illustrationItem || data.type !== 'empty';
   const isInteractive = data.type !== 'empty';
-  const isLargeText = data.id?.startsWith('text-request') || data.id?.startsWith('text-terms') || data.id?.startsWith('text-report');
+  const isLargeText = data.id?.startsWith('text-request') || data.id?.startsWith('text-terms') || data.id?.startsWith('text-report') || data.type === 'booth_item';
 
   let targetScaleZ = 1;
 
@@ -470,9 +470,9 @@ function WallBlock({ uid, rect, data, onClick, illustrationItem, onIllustrationC
 
         e.stopPropagation();
 
-        if (illustrationItem && (illustrationItem.type === 'image' || !illustrationItem.type)) {
+        if (illustrationItem && (illustrationItem.type === 'image' || !illustrationItem.type) && data.type !== 'booth_item') {
           onIllustrationClick(illustrationItem);
-        } else if (data.type === 'usage_report' && onReportClick && data.src) {
+        } else if ((data.type === 'usage_report' || data.type === 'booth_item') && onReportClick && data.src) {
           onReportClick(data.src);
         } else if (isLargeText && onTextClick && data.title && data.description) {
           onTextClick(data.title, data.description);
@@ -532,7 +532,7 @@ function WallBlock({ uid, rect, data, onClick, illustrationItem, onIllustrationC
 function IndependentEmbed({ rect, data, illustrationItem }: { rect: Rect, data: GridItemData, illustrationItem?: IllustrationItem }) {
   const ref = useRef<THREE.Group>(null);
   const isProfileAbout = data.id?.startsWith('about-');
-  const isLargeText = data.id?.startsWith('text-request') || data.id?.startsWith('text-terms') || data.id?.startsWith('text-report');
+  const isLargeText = data.id?.startsWith('text-request') || data.id?.startsWith('text-terms') || data.id?.startsWith('text-report') || data.type === 'booth_item';
 
   useFrame(({ camera, clock }) => {
     if (!ref.current) return;
@@ -559,14 +559,14 @@ function IndependentEmbed({ rect, data, illustrationItem }: { rect: Rect, data: 
   return (
     <group ref={ref}>
       {illustrationItem?.type === 'youtube' && (
-        <Html transform scale={0.3} className="wall-html-content" style={{ width: `${rect.w * 133}px`, height: `${rect.h * 133}px`, pointerEvents: 'auto' }}>
+        <Html transform scale={0.2} className="wall-html-content" style={{ width: `${rect.w * 200}px`, height: `${rect.h * 200}px`, pointerEvents: 'auto' }}>
           <div style={{ width: '100%', height: '100%', overflow: 'hidden', background: '#000' }}>
             <iframe width="100%" height="100%" src={`https://www.youtube.com/embed/${illustrationItem.videoId}?controls=1&rel=0&modestbranding=1`} title={illustrationItem.title} frameBorder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" style={{ border: 'none', width: '100%', height: '100%' }} />
           </div>
         </Html>
       )}
       {illustrationItem?.type === 'soundcloud' && (
-        <Html transform scale={0.4} className="wall-html-content" style={{ width: `${rect.w * 100}px`, height: `${rect.h * 100}px`, pointerEvents: 'auto' }}>
+        <Html transform scale={0.267} className="wall-html-content" style={{ width: `${rect.w * 150}px`, height: `${rect.h * 150}px`, pointerEvents: 'auto' }}>
           <div style={{ width: '100%', height: '100%', overflow: 'hidden', background: '#000' }}>
             <iframe width="100%" height="100%" frameBorder="no" scrolling="no" allow="autoplay" src={`https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/${illustrationItem.trackId}&color=%23ff5500&auto_play=false&hide_related=true&show_comments=false&visual=true`} style={{ border: 'none', width: '100%', height: '100%' }} />
           </div>
@@ -575,17 +575,17 @@ function IndependentEmbed({ rect, data, illustrationItem }: { rect: Rect, data: 
       {data.type === 'about_name' && (
         <Html transform position={[0, 0, 0]} distanceFactor={1.5} pointerEvents="none" className="wall-html-content">
           <div style={{ textAlign: 'center', color: 'white', width: '600px', userSelect: 'none' }}>
-            <h1 style={{ fontSize: '64px', fontWeight: 900, letterSpacing: '0.2em' }}>ミナモト</h1>
+            <h1 style={{ fontSize: '64px', fontWeight: 900, letterSpacing: '0.2em', fontFamily: "'WDXL Lubrifont JP N', sans-serif" }}>ミナモト</h1>
           </div>
         </Html>
       )}
-      {(data.type === 'about_text' || data.type === 'usage_report') && (
+      {(data.type === 'about_text' || data.type === 'usage_report' || data.type === 'booth_item') && (
         <Html transform position={[0, 0, 0]} scale={isProfileAbout ? 1 : 0.2} distanceFactor={isProfileAbout ? 1.2 : undefined} pointerEvents="none" className="wall-html-content">
           <div style={{ 
             color: 'white', textAlign: (isProfileAbout || isLargeText) ? 'center' : 'left', fontWeight: isLargeText ? 700 : 400,
-            fontSize: isProfileAbout ? '48px' : (data.type === 'usage_report' ? '22px' : (isLargeText ? '32px' : '26px')), 
+            fontSize: isProfileAbout ? '48px' : (data.type === 'usage_report' || data.type === 'booth_item' ? '22px' : (isLargeText ? '32px' : '26px')), 
             fontFamily: isProfileAbout ? 'inherit' : "'DotGothic16', sans-serif",
-            width: isProfileAbout ? '1600px' : `${rect.w * 200}px`, height: isProfileAbout ? 'auto' : `${rect.h * 200}px`,
+            width: isProfileAbout ? '1600px' : (`${rect.w * 200}px`), height: isProfileAbout ? 'auto' : `${rect.h * 200}px`,
             whiteSpace: 'pre-wrap', lineHeight: 1.4, overflowY: 'hidden', padding: isProfileAbout ? '0' : '20px', display: 'flex', alignItems: 'center', justifyContent: 'center', boxSizing: 'border-box'
           }}>
             {isLargeText ? data.title : data.description}
@@ -758,7 +758,7 @@ export function InfiniteWall({
 
           if (rect.dataIndex >= 80 && rect.dataIndex < 80 + requestTextDataArray.length) {
             dataItem = requestTextDataArray[rect.dataIndex - 80];
-          } else if (rect.dataIndex >= 90 && rect.dataIndex < 90 + termsTextDataArray.length + reportTextDataArray.length) {
+          } else if (rect.dataIndex >= 90 && rect.dataIndex < 90 + termsTextDataArray.length + reportTextDataArray.length + boothDataArray.length) {
             if (rect.dataIndex === 90) {
               dataItem = termsTextDataArray[0];
             } else if (rect.dataIndex === 91) {
@@ -820,11 +820,19 @@ export function InfiniteWall({
           isModalOpen={isModalOpen}
         />
         <AcrylicKeyHolder 
-          position={isMobile ? [1.2, -2.2, 0.58] : [1.3, -1.8, 0.58]} 
+          position={isMobile ? [-1.0, -3.2, 0.58] : [1.3, -1.8, 0.58]} 
           iconUrl="/soundcloud.png" 
           linkUrl="https://soundcloud.com/mina_root" 
           iconSize={[1.6, 0.8]}
           timeOffset={1.5}
+          isModalOpen={isModalOpen}
+        />
+        <AcrylicKeyHolder 
+          position={isMobile ? [0.2, -3.2, 0.5] : [2.6, -1.8, 0.5]} 
+          iconUrl="/pixivfanbox.png" 
+          linkUrl="https://mina-root.fanbox.cc/" 
+          iconSize={[2.8, 0.4]}
+          timeOffset={2.0}
           isModalOpen={isModalOpen}
         />
       </group>

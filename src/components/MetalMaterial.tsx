@@ -1,4 +1,3 @@
-import * as THREE from 'three';
 import { forwardRef, useMemo } from 'react';
 
 export const MetalMaterial = forwardRef((props: any, ref) => {
