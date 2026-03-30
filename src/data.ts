@@ -11,6 +11,14 @@ export interface IllustrationItem {
 
 export type ContentType = 'image' | 'youtube' | 'soundcloud' | 'project' | 'contact' | 'empty' | 'illustration_folder' | 'about_name' | 'about_icon' | 'about_text' | 'pagination' | 'usage_report' | 'booth_item';
 
+const BASE_URL = import.meta.env.BASE_URL;
+const resolveAsset = (path: string) => {
+  if (path.startsWith('http')) return path;
+  // Remove leading slash if present then prepend BASE_URL
+  const cleanPath = path.startsWith('/') ? path.slice(1) : path;
+  return `${BASE_URL}${cleanPath}`;
+};
+
 export interface GridItemData {
   id: string;
   type: ContentType;
@@ -32,16 +40,16 @@ export interface GridItemData {
 // ローカルの画像を使う場合は、"public/illustrations/" フォルダ内に画像を配置し、
 // srcの値を "/illustrations/ファイル名.png" などのように指定してください。
 export const illustrationsData: IllustrationItem[] = [
-  { id: "illus-1", src: "/illustrations/Outpost_Dissonance.jpg", title: "Outpost:Dissonance\n    -advance- \n   ジャケット", caption: "楽曲『Outpost:Dissonance』ジャケット", aspectRatio: 1.0 },
-  { id: "illus-2", src: "/illustrations/a_grain.png", title: "a grain", aspectRatio: 0.9949 },
-  { id: "illus-3", src: "/illustrations/dropsound.jpg", title: "Dropsound.", aspectRatio: 1.5175 },
-  { id: "illus-4", src: "/illustrations/magsafeangel.jpg", title: "MagsafeAngel", aspectRatio: 0.4766 },
-  { id: "illus-5", src: "/illustrations/向こう側.png", title: "向こう側", aspectRatio: 0.4614 },
-  { id: "illus-6", src: "/illustrations/拡散する未来.png", title: "拡散する未来", aspectRatio: 1.6667 },
-  { id: "illus-7", src: "/illustrations/浮遊.png", title: "浮遊", aspectRatio: 0.4619 },
-  { id: "illus-9", src: "/illustrations/跳躍3.5.png", title: "跳躍3.5", aspectRatio: 0.5731 },
-  { id: "illus-10", src: "/illustrations/風化させることなかれ.png", title: "風化させることなかれ", aspectRatio: 2.0 },
-  { id: "illus-11", src: "/illustrations/風鈴.jpg", title: "風鈴", aspectRatio: 0.5933 }
+  { id: "illus-1", src: resolveAsset("/illustrations/Outpost_Dissonance.jpg"), title: "Outpost:Dissonance\n    -advance- \n   ジャケット", caption: "楽曲『Outpost:Dissonance』ジャケット", aspectRatio: 1.0 },
+  { id: "illus-2", src: resolveAsset("/illustrations/a_grain.png"), title: "a grain", aspectRatio: 0.9949 },
+  { id: "illus-3", src: resolveAsset("/illustrations/dropsound.jpg"), title: "Dropsound.", aspectRatio: 1.5175 },
+  { id: "illus-4", src: resolveAsset("/illustrations/magsafeangel.jpg"), title: "MagsafeAngel", aspectRatio: 0.4766 },
+  { id: "illus-5", src: resolveAsset("/illustrations/向こう側.png"), title: "向こう側", aspectRatio: 0.4614 },
+  { id: "illus-6", src: resolveAsset("/illustrations/拡散する未来.png"), title: "拡散する未来", aspectRatio: 1.6667 },
+  { id: "illus-7", src: resolveAsset("/illustrations/浮遊.png"), title: "浮遊", aspectRatio: 0.4619 },
+  { id: "illus-9", src: resolveAsset("/illustrations/跳躍3.5.png"), title: "跳躍3.5", aspectRatio: 0.5731 },
+  { id: "illus-10", src: resolveAsset("/illustrations/風化させることなかれ.png"), title: "風化させることなかれ", aspectRatio: 2.0 },
+  { id: "illus-11", src: resolveAsset("/illustrations/風鈴.jpg"), title: "風鈴", aspectRatio: 0.5933 }
 ];
 
 export const discographyData: IllustrationItem[] = [
@@ -49,7 +57,7 @@ export const discographyData: IllustrationItem[] = [
     id: "disco-1",
     type: "soundcloud",
     trackId: "2284551407",
-    src: "/illustrations/Outpost_Dissonance.jpg",
+    src: resolveAsset("/illustrations/Outpost_Dissonance.jpg"),
     title: "Outpost:Dissonance  -advance-",
     caption: "",
     aspectRatio: 3.0
@@ -67,7 +75,7 @@ export const discographyData: IllustrationItem[] = [
     id: "disco-3",
     type: "youtube",
     videoId: "Gsn3BRKPxps",
-    src: "/illustrations/狂信.PNG",
+    src: resolveAsset("/illustrations/狂信.PNG"),
     title: "狂信 / 花隈千冬",
     caption: "",
     aspectRatio: 1.7778
@@ -90,9 +98,9 @@ export const aboutData: GridItemData[] = [
     width: 1.2, 
     height: 1.2, 
     depthOffset: 0.6,
-    src: "/illustrations/狂信.PNG",
+    src: resolveAsset("/illustrations/狂信.PNG"),
     illustrationItems: [
-      { id: "about-icon-img", src: "/illustrations/狂信.PNG", aspectRatio: 1.7778, title: "狂信" }
+      { id: "about-icon-img", src: resolveAsset("/illustrations/狂信.PNG"), aspectRatio: 1.7778, title: "狂信" }
     ]
   },
   { 
@@ -282,7 +290,7 @@ export const boothDataArray: GridItemData[] = [
     illustrationItems: [
       {
         id: 'booth-ring-img',
-        src: '/Booth/choco_macaron.png',
+        src: resolveAsset('/Booth/choco_macaron.png'),
         aspectRatio: 1.0, 
       }
     ]

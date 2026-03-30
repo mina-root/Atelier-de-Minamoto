@@ -6,6 +6,7 @@ import { aboutData, contentPoolData, requestTextDataArray, termsTextDataArray, r
 import { THEME } from '../theme';
 import { PaperMaterial } from './PaperMaterial';
 import { MetalMaterial } from './MetalMaterial';
+const BASE_URL = import.meta.env.BASE_URL;
 
 // --- Types & Constants ---
 interface Rect {
@@ -821,22 +822,22 @@ export function InfiniteWall({
         {/* Static decorative elements - displayed once per tile but they loop with the wall */}
         <AcrylicKeyHolder 
           position={isMobile ? [-1.3, -2.2, 0.5] : [-1.5, -1.8, 0.5]} 
-          iconUrl="/x_logo.png" 
+          iconUrl={`${BASE_URL}x_logo.png`} 
           linkUrl="https://x.com/mina_Root" 
           timeOffset={0}
           isModalOpen={isModalOpen}
         />
         <AcrylicKeyHolder 
           position={isMobile ? [-0.6, -2.2, 0.55] : [-0.7, -1.8, 0.55]} 
-          iconUrl="/pixiv_icon.png" 
-          logoUrl="/pixiv_logo.png" 
+          iconUrl={`${BASE_URL}pixiv_icon.png`} 
+          logoUrl={`${BASE_URL}pixiv_logo.png`} 
           linkUrl="https://www.pixiv.net/users/87371443" 
           timeOffset={0.5}
           isModalOpen={isModalOpen}
         />
         <AcrylicKeyHolder 
           position={isMobile ? [0.3, -2.2, 0.45] : [0.3, -1.8, 0.45]} 
-          iconUrl="/skeb.svg" 
+          iconUrl={`${BASE_URL}skeb.svg`} 
           linkUrl="https://skeb.jp/@mina_Root" 
           iconSize={[2, 0.6]}
           timeOffset={1.0}
@@ -844,7 +845,7 @@ export function InfiniteWall({
         />
         <AcrylicKeyHolder 
           position={isMobile ? [-1.0, -3.2, 0.58] : [1.3, -1.8, 0.58]} 
-          iconUrl="/soundcloud.png" 
+          iconUrl={`${BASE_URL}soundcloud.png`} 
           linkUrl="https://soundcloud.com/mina_root" 
           iconSize={[1.6, 0.8]}
           timeOffset={1.5}
@@ -852,7 +853,7 @@ export function InfiniteWall({
         />
         <AcrylicKeyHolder 
           position={isMobile ? [0.2, -3.2, 0.5] : [2.6, -1.8, 0.5]} 
-          iconUrl="/pixivfanbox.png" 
+          iconUrl={`${BASE_URL}pixivfanbox.png`} 
           linkUrl="https://mina-root.fanbox.cc/" 
           iconSize={[2.8, 0.4]}
           timeOffset={2.0}
