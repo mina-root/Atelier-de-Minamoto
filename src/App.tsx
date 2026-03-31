@@ -134,8 +134,8 @@ function App() {
     <div 
       className={isModalOpen ? 'modal-is-open' : ''}
       style={{ 
-        width: '100vw', 
-        height: '100vh', 
+        width: '100%', 
+        height: '100dvh', 
         position: 'relative', 
         overflow: 'hidden'
       }}
@@ -167,7 +167,7 @@ function App() {
           style={{
             position: 'fixed',
             top: 0, left: 0,
-            width: '100vw', height: '100vh',
+            width: '100%', height: '100dvh',
             background: THEME.colors.modalBackground,
             backdropFilter: 'blur(12px)',
             zIndex: 2147483647,
@@ -272,7 +272,7 @@ function App() {
           style={{
             position: 'fixed',
             top: 0, left: 0,
-            width: '100vw', height: '100vh',
+            width: '100%', height: '100dvh',
             background: THEME.colors.modalBackground,
             backdropFilter: 'blur(12px)',
             zIndex: 2147483647,
