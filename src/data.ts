@@ -79,6 +79,15 @@ export const discographyData: IllustrationItem[] = [
     title: "狂信 / 花隈千冬",
     caption: "",
     aspectRatio: 1.7778
+  },
+  {
+    id: "disco-4",
+    type: "soundcloud",
+    trackId: "2325454355",
+    src: "https://i1.sndcdn.com/artworks-q4QlCcyDdLDjyFL2-OzwSBQ-t500x500.jpg",
+    title: "Membrana",
+    caption: "",
+    aspectRatio: 3.0
   }
 ];
 
